@@ -1,7 +1,34 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTree", "TTree\TTree.csproj", "{A822AE90-F9CF-45A7-AC28-1ABF705706E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TTreeTest", "TTreeTest\TTreeTest.csproj", "{4D4C7190-9FC7-4D7F-8EF7-6846E6DAD69B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3AA635DC-0963-4C1A-A35C-FCFE4191DD48}"
+	ProjectSection(SolutionItems) = preProject
+		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
+		t-tree.vsmdi = t-tree.vsmdi
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = t-tree.vsmdi
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A822AE90-F9CF-45A7-AC28-1ABF705706E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A822AE90-F9CF-45A7-AC28-1ABF705706E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A822AE90-F9CF-45A7-AC28-1ABF705706E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A822AE90-F9CF-45A7-AC28-1ABF705706E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D4C7190-9FC7-4D7F-8EF7-6846E6DAD69B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D4C7190-9FC7-4D7F-8EF7-6846E6DAD69B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D4C7190-9FC7-4D7F-8EF7-6846E6DAD69B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D4C7190-9FC7-4D7F-8EF7-6846E6DAD69B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
