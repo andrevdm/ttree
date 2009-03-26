@@ -34,8 +34,23 @@ namespace TTree
 
 			if( isBoundingNode )
 			{
-				//This is the bounding node, add the new item
-				return InsertInCurrentNode( item );
+				//Is there space in this node?
+				if( Count < m_data.Length )
+				{
+					//This is the bounding node, add the new item
+					return InsertInCurrentNode( item );
+				}
+				else
+				{
+					//TODO HERE: 
+					// copy 1st item 
+					// find insertion point, startin at pos 1 (check for aleady existing). 
+					// Move nodes up to insertion point left
+					// Add new item
+					// Left/Right.Insert( old 1st place)
+
+					throw new NotImplementedException();
+				}
 			}
 			else
 			{
@@ -51,8 +66,8 @@ namespace TTree
 				//If we are here then, there is no bounding node for this value.
 				Debug.Assert( IsLeaf || IsHalfLeaf, "Something is very wrong if this node is not a leaf or half-leaf." );
 
-				//Is this node full?
-				if( Count < m_minimum )
+				//Is there place in this node
+				if( Count < m_data.Length )
 				{
 					//There is place in this node so add the new value. However since this value
 					// must be the new minimum or maximum (otherwise it would have found a bounding
@@ -75,8 +90,23 @@ namespace TTree
 				}
 				else
 				{
-					//TODO overflow
-					throw new NotImplementedException();
+					//Create a new child node
+					Tree<T> newChild = new Tree<T>( m_minimum, m_data.Length );
+					newChild.m_data[ 0 ] = item;
+					newChild.Count = 1;
+					newChild.Parent = this;
+
+					//Add it as the the left or the right child
+					if( item.CompareTo( m_data[ 0 ] ) < 0 )
+					{
+						Debug.Assert( Left == null, "The left node should be null" );
+						Left = newChild;
+					}
+					else
+					{
+						Debug.Assert( Left == null, "The right node should be null" );
+						Right = newChild;
+					}
 				}
 			}
 
@@ -95,31 +125,23 @@ namespace TTree
 			//If closest is positive then the item already exists at this level, so
 			// no need to add it again
 			if( closest >= 0 )
-				return true;
+				return false;
 
-			//Is there space in this node?
-			if( Count < m_minimum )
-			{
-				//Negate the result, which gives info about where the closest match is
-				closest = ~closest;
+			//Negate the result, which gives info about where the closest match is
+			closest = ~closest;
 
-				//If closest is greater than the count then there is no item in the array than the item being added,
-				// so add it to the end of the array. Otherwise the negated value is the position to add the item to
-				if( closest > Count )
-					closest = Count;
+			//If closest is greater than the count then there is no item in the array than the item being added,
+			// so add it to the end of the array. Otherwise the negated value is the position to add the item to
+			if( closest > Count )
+				closest = Count;
 
-				//Shift the items up by one place to make space for the new item. This also works when adding
-				// an item to the end of the array.
-				Array.Copy( m_data, closest, m_data, closest + 1, Count - closest );
-				m_data[ closest ] = item;
+			//Shift the items up by one place to make space for the new item. This also works when adding
+			// an item to the end of the array.
+			Array.Copy( m_data, closest, m_data, closest + 1, Count - closest );
+			m_data[ closest ] = item;
 
-				//An item has been added.
-				Count++;
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
+			//An item has been added.
+			Count++;
 
 			return true;
 		}
@@ -141,12 +163,13 @@ namespace TTree
 			throw new NotImplementedException();
 		}
 
-		public void CopyArray( T[] destinationArray, int index )
+		public void CopyItems( T[] destinationArray, int index )
 		{
 			m_data.CopyTo( destinationArray, index );
 		}
 
 		public int Count { get; protected set; }
+		public int MaxItems { get { return m_data.Length; } }
 		public Tree<T> Left { get; set; }
 		public Tree<T> Right { get; set; }
 		public Tree<T> Parent { get; set; }
