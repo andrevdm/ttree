@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace TTree
 {
@@ -26,15 +27,75 @@ namespace TTree
 			m_minimum = minimum;
 		}
 
-		public void Insert( T item )
+		public bool Insert( T item )
 		{
+			//Is this the bounding node for the new item? If the node is empty it is considered to be the bounding node.
+			bool isBoundingNode = (Count == 0) || ((item.CompareTo( m_data[ 0 ] ) >= 0) && (item.CompareTo( m_data[ Count - 1 ] ) <= 0));
+
+			if( isBoundingNode )
+			{
+				//This is the bounding node, add the new item
+				return InsertInCurrentNode( item );
+			}
+			else
+			{
+				//If the item is less than the minimum and there is a left node, follow it
+				if( (Left != null) && (item.CompareTo( m_data[ 0 ] ) < 0) )
+					return Left.Insert( item );
+
+				//If the item is less than the maximum and there is a right node, follow it
+				if( (Right != null) && (item.CompareTo( m_data[ 0 ] ) > 0) )
+					return Right.Insert( item );
+
+
+				//If we are here then, there is no bounding node for this value.
+				Debug.Assert( IsLeaf || IsHalfLeaf, "Something is very wrong if this node is not a leaf or half-leaf." );
+
+				//Is this node full?
+				if( Count < m_minimum )
+				{
+					//There is place in this node so add the new value. However since this value
+					// must be the new minimum or maximum (otherwise it would have found a bounding
+					// node) dont call InsertInCurrentNode which would do a binary search to find
+					// an insert location. Rather check for min/max and add it here.
+					if( item.CompareTo( m_data[ 0 ] ) > 0 )
+					{
+						//The item is greater than the minimum, therfore it must be the new maximum.
+						// Add it to the end of the array
+						m_data[ Count ] = item;
+					}
+					else
+					{
+						//The item is the new miminum. Shift the array up and insert it.
+						Array.Copy( m_data, 0, m_data, 1, Count );
+						m_data[ 0 ] = item;
+					}
+
+					Count++;
+				}
+				else
+				{
+					//TODO overflow
+					throw new NotImplementedException();
+				}
+			}
+
+			return true;
+		}
+
+		private bool InsertInCurrentNode( T item )
+		{
+			Debug.Assert( Count < m_data.Length, "This method must never be called on a full node" );
+
+			//TODO profile and see if there is any advantage to checking the min and max values here and setting closest=0 or closest=Count. Remember to check that the item was not already added
+
 			//Find the position with the closest value to the item being added.
 			int closest = Array.BinarySearch<T>( m_data, 0, Count, item );
 
-			//If closest is posative then the item already exists at this level, so
+			//If closest is positive then the item already exists at this level, so
 			// no need to add it again
 			if( closest >= 0 )
-				return;
+				return true;
 
 			//Is there space in this node?
 			if( Count < m_minimum )
@@ -59,6 +120,8 @@ namespace TTree
 			{
 				throw new NotImplementedException();
 			}
+
+			return true;
 		}
 
 		public void Delete( T item )
