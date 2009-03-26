@@ -14,7 +14,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void InsertIntoRootWithSpace()
 		{
-			var tree = new Tree<int>( 10, 13 );
+			var tree = new Tree<int>( 5, 5 );
 
 			tree.Insert( 10 );
 			tree.Insert( 5 );
@@ -22,7 +22,7 @@ namespace TTreeTest
 			tree.Insert( 7 );
 			tree.Insert( 3 );
 
-			var data = new int[ 13 ];
+			var data = new int[ 5 ];
 			tree.CopyArray( data, 0 );
 
 			Assert.AreEqual( 5, tree.Count, "Invalid count" );

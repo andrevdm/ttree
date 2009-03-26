@@ -84,8 +84,10 @@ namespace TTree
 		}
 
 		public int Count { get; protected set; }
-		public Tree<T> Parent { get; set; }
 		public Tree<T> Left { get; set; }
 		public Tree<T> Right { get; set; }
+		public Tree<T> Parent { get; set; }
+		public bool IsLeaf { get { return (Left == null) && (Right == null); } }
+		public bool IsHalfLeaf { get { return !IsLeaf && ((Left == null) || (Right == null)); } }
 	}
 }
