@@ -1,0 +1,10 @@
+digraph structs {
+	node [shape=record];
+	
+	struct1 [shape=record, label="{ { |  |  | } | { <left> . | <right> . }}"];
+	struct2 [shape=record, label="{ { |  |  | } | { <left> . | <right> . }}"];
+	struct3 [shape=record, label="{ { |  |  | } | { <left> . | <right> . }}"];
+	
+	"struct1":right -> "struct3"
+	"struct1":left -> "struct2"
+}
