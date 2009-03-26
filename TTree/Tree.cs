@@ -28,21 +28,31 @@ namespace TTree
 
 		public void Insert( T item )
 		{
+			//Find the position with the closest value to the item being added.
+			int closest = Array.BinarySearch<T>( m_data, 0, Count, item );
+
+			//If closest is posative then the item already exists at this level, so
+			// no need to add it again
+			if( closest >= 0 )
+				return;
+
 			//Is there space in this node?
 			if( Count < m_minimum )
 			{
-				int closest = Array.BinarySearch<T>( m_data, 0, Count, item );
+				//Negate the result, which gives info about where the closest match is
+				closest = ~closest;
 
-				if( closest < 0 )
-				{
-					closest = ~closest;
+				//If closest is greater than the count then there is no item in the array than the item being added,
+				// so add it to the end of the array. Otherwise the negated value is the position to add the item to
+				if( closest > Count )
+					closest = Count;
 
-					if( closest > Count )
-						closest = Count;
-				}
-
+				//Shift the items up by one place to make space for the new item. This also works when adding
+				// an item to the end of the array.
 				Array.Copy( m_data, closest, m_data, closest + 1, Count - closest );
 				m_data[ closest ] = item;
+
+				//An item has been added.
 				Count++;
 			}
 			else
