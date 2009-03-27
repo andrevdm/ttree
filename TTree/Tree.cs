@@ -6,6 +6,11 @@ using System.Diagnostics;
 
 namespace TTree
 {
+	/// <summary>
+	/// T-Tree implementation.
+	/// Google "A Study of Index Structures for Main Memory Database Management Systems"
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	public class Tree<T> //visitor, IEnumerable etc
 		where T : IComparable
 	{
@@ -27,6 +32,11 @@ namespace TTree
 			m_minimum = minimum;
 		}
 
+		/// <summary>
+		/// Inserts the specified item.
+		/// </summary>
+		/// <param name="item">The item.</param>
+		/// <returns>True if the item was added or false if it already existed and was not </returns>
 		public bool Insert( T item )
 		{
 			//Is this the bounding node for the new item? If the node is empty it is considered to be the bounding node.
@@ -38,18 +48,28 @@ namespace TTree
 				if( Count < m_data.Length )
 				{
 					//This is the bounding node, add the new item
-					return InsertInCurrentNode( item );
+					return InsertInCurrentNode( item, false );
 				}
 				else
 				{
-					//TODO HERE: 
-					// copy 1st item 
-					// find insertion point, startin at pos 1 (check for aleady existing). 
-					// Move nodes up to insertion point left
-					// Add new item
-					// Left/Right.Insert( old 1st place)
+					//Copy the old minimum. This current item will be inserted into this node
+					T oldMinimum = m_data[ 0 ];
 
-					throw new NotImplementedException();
+					if( !InsertInCurrentNode( item, true ) )
+						return false;
+
+					//Add the old minimum
+					if( Left == null )
+					{
+						//There is no left child, so create on
+						Left = CreateChild( oldMinimum );
+						return true;
+					}
+					else
+					{
+						//Add the old minimum to the left child
+						return Left.Insert( oldMinimum );
+					}
 				}
 			}
 			else
@@ -90,11 +110,7 @@ namespace TTree
 				}
 				else
 				{
-					//Create a new child node
-					Tree<T> newChild = new Tree<T>( m_minimum, m_data.Length );
-					newChild.m_data[ 0 ] = item;
-					newChild.Count = 1;
-					newChild.Parent = this;
+					Tree<T> newChild = CreateChild( item );
 
 					//Add it as the the left or the right child
 					if( item.CompareTo( m_data[ 0 ] ) < 0 )
@@ -113,9 +129,19 @@ namespace TTree
 			return true;
 		}
 
-		private bool InsertInCurrentNode( T item )
+		/// <summary>
+		/// Inserts an item into the current node. This method can be called in two instances
+		/// 1 - When this node is not full
+		/// 2 - When this node is full and the first item has been copied so that it can be
+		/// used as the new insert value. 
+		/// </summary>
+		/// <param name="item">The item.</param>
+		/// <param name="fullShiftToLeft">if set to <c>true</c> [full shift to left].</param>
+		/// <returns></returns>
+		private bool InsertInCurrentNode( T item, bool fullShiftToLeft )
 		{
-			Debug.Assert( Count < m_data.Length, "This method must never be called on a full node" );
+			Debug.Assert( fullShiftToLeft ? (Count == m_data.Length) : (Count < m_data.Length), "If doing a shift left, the node should have been full, otherwise it should not be called if the node is full" );
+
 
 			//TODO profile and see if there is any advantage to checking the min and max values here and setting closest=0 or closest=Count. Remember to check that the item was not already added
 
@@ -135,13 +161,23 @@ namespace TTree
 			if( closest > Count )
 				closest = Count;
 
-			//Shift the items up by one place to make space for the new item. This also works when adding
-			// an item to the end of the array.
-			Array.Copy( m_data, closest, m_data, closest + 1, Count - closest );
-			m_data[ closest ] = item;
+			if( !fullShiftToLeft )
+			{
+				//Shift the items up by one place to make space for the new item. This also works when adding
+				// an item to the end of the array.
+				Array.Copy( m_data, closest, m_data, closest + 1, Count - closest );
 
-			//An item has been added.
-			Count++;
+				m_data[ closest ] = item;
+
+				//An item has been added.
+				Count++;
+			}
+			else
+			{
+				//Shift the items before the insertion point to the left.
+				Array.Copy( m_data, 1, m_data, 0, closest - 1 );
+				m_data[ closest - 1 ] = item;
+			}
 
 			return true;
 		}
@@ -168,6 +204,21 @@ namespace TTree
 			m_data.CopyTo( destinationArray, index );
 		}
 
+		/// <summary>
+		/// Creates a new child node.
+		/// </summary>
+		/// <param name="item">The item.</param>
+		/// <returns></returns>
+		private Tree<T> CreateChild( T item )
+		{
+			//Create a new child node
+			Tree<T> newChild = new Tree<T>( m_minimum, m_data.Length );
+			newChild.m_data[ 0 ] = item;
+			newChild.Count = 1;
+			newChild.Parent = this;
+			return newChild;
+		}
+
 		public int Count { get; protected set; }
 		public int MaxItems { get { return m_data.Length; } }
 		public Tree<T> Left { get; set; }
@@ -176,4 +227,6 @@ namespace TTree
 		public bool IsLeaf { get { return (Left == null) && (Right == null); } }
 		public bool IsHalfLeaf { get { return !IsLeaf && ((Left == null) || (Right == null)); } }
 	}
+
+	
 }
