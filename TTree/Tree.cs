@@ -204,6 +204,58 @@ namespace TTree
 			m_data.CopyTo( destinationArray, index );
 		}
 
+		public string ToDot()
+		{
+			return ToDot( i => i.ToString() );
+		}
+
+		public string ToDot( Func<T,string> toString )
+		{
+			var dot = new StringBuilder();
+
+			dot.AppendLine( "digraph structs {{" );
+			dot.AppendLine( "	node [shape=record, fontsize=9, fontname=Ariel];" );
+			ToDot( dot, toString );
+			dot.AppendLine( "}}" );
+
+			return dot.ToString();
+		}
+
+		private void ToDot( StringBuilder dot, Func<T,string> toString )
+		{
+			dot.AppendFormat( "	struct{0} [shape=record, label=\"{{ {{ ", GetHashCode().ToString( "X" ) );
+
+			for( int i = 0; i < m_data.Length; ++i )
+			{
+				if( i > 0 )
+				{
+					dot.Append( "| " );
+				}
+
+				if( i < Count )
+				{
+					dot.AppendFormat( "{0}", toString( m_data[ i ] ) );
+				}
+			}
+
+			dot.AppendFormat( " }} | {{ <left> . | <m> d={0}, h={1} | <right> . }} }}\"];", Depth, Height ).AppendLine();
+
+			if( Left != null )
+				Left.ToDot( dot, toString );
+
+			if( Right != null )
+				Right.ToDot( dot, toString );
+
+			if( Left != null )
+				dot.AppendFormat( "	\"struct{0}\":left -> struct{1};", GetHashCode().ToString( "X" ), Left.GetHashCode().ToString( "X" ) ).AppendLine();
+
+			if( Right != null )
+				dot.AppendFormat( "	\"struct{0}\":right -> struct{1};", GetHashCode().ToString( "X" ), Right.GetHashCode().ToString( "X" ) ).AppendLine();
+
+			if( Parent != null )
+				dot.AppendFormat( "	struct{0} -> \"struct{1}\":m [style=dotted, color=saddlebrown, arrowsize=0.4];", GetHashCode().ToString( "X" ), Parent.GetHashCode().ToString( "X" ) ).AppendLine();
+		}
+
 		/// <summary>
 		/// Creates a new child node.
 		/// </summary>
@@ -217,6 +269,42 @@ namespace TTree
 			newChild.Count = 1;
 			newChild.Parent = this;
 			return newChild;
+		}
+
+		/// <summary>
+		/// Distance from the root
+		/// </summary>
+		/// <value>The depth.</value>
+		public int Depth
+		{
+			get
+			{
+				int depth = 0;
+				var at = Parent;
+
+				while( at != null )
+				{
+					++depth;
+					at = at.Parent;
+				}
+
+				return depth;
+			}
+		}
+
+		/// <summary>
+		/// Gets the height.
+		/// </summary>
+		/// <value>The height.</value>
+		public int Height
+		{
+			get
+			{
+				int leftHeight = (Left != null) ? Left.Height + 1 : 0;
+				int rightHeight = (Right != null) ? Right.Height + 1 : 0;
+
+				return Math.Max( leftHeight, rightHeight );
+			}
 		}
 
 		public int Count { get; protected set; }
