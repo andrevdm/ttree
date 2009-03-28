@@ -16,6 +16,7 @@ namespace TTree
 	{
 		protected readonly T[] m_data;
 		protected readonly int m_minimum;
+		protected int m_height = 0;
 
 		public Tree( int minimum, int maximum )
 		{
@@ -63,6 +64,7 @@ namespace TTree
 					{
 						//There is no left child, so create on
 						Left = CreateChild( oldMinimum );
+						UpdateHeight();
 						return true;
 					}
 					else
@@ -123,6 +125,8 @@ namespace TTree
 						Debug.Assert( Left == null, "The right node should be null" );
 						Right = newChild;
 					}
+					
+					UpdateHeight();
 				}
 			}
 
@@ -182,6 +186,8 @@ namespace TTree
 			return true;
 		}
 
+		//private virtual Rebalance
+
 		public void Delete( T item )
 		{
 			throw new NotImplementedException();
@@ -238,7 +244,7 @@ namespace TTree
 				}
 			}
 
-			dot.AppendFormat( " }} | {{ <left> . | <m> d={0}, h={1} | <right> . }} }}\"];", Depth, Height ).AppendLine();
+			dot.AppendFormat( " }} | {{ <left> . | <m> h={0} | <right> . }} }}\"];", Height ).AppendLine();
 
 			if( Left != null )
 				Left.ToDot( dot, toString );
@@ -268,27 +274,24 @@ namespace TTree
 			newChild.m_data[ 0 ] = item;
 			newChild.Count = 1;
 			newChild.Parent = this;
+
+			newChild.UpdateHeight();
+
 			return newChild;
 		}
 
-		/// <summary>
-		/// Distance from the root
-		/// </summary>
-		/// <value>The depth.</value>
-		public int Depth
+		private void UpdateHeight()
 		{
-			get
+			if( Count == 0 )
 			{
-				int depth = 0;
-				var at = Parent;
+				m_height = -1;
+			}
+			else
+			{
+				int lheight = (Left != null) ? (Left.Height) : -1;
+				int rheight = (Right != null) ? (Right.Height) : -1;
 
-				while( at != null )
-				{
-					++depth;
-					at = at.Parent;
-				}
-
-				return depth;
+				m_height = 1 + Math.Max( lheight, rheight );
 			}
 		}
 
@@ -296,17 +299,7 @@ namespace TTree
 		/// Gets the height.
 		/// </summary>
 		/// <value>The height.</value>
-		public int Height
-		{
-			get
-			{
-				int leftHeight = (Left != null) ? Left.Height + 1 : 0;
-				int rightHeight = (Right != null) ? Right.Height + 1 : 0;
-
-				return Math.Max( leftHeight, rightHeight );
-			}
-		}
-
+		public int Height { get { return m_height; } }
 		public int Count { get; protected set; }
 		public int MaxItems { get { return m_data.Length; } }
 		public Tree<T> Left { get; set; }
@@ -314,7 +307,5 @@ namespace TTree
 		public Tree<T> Parent { get; set; }
 		public bool IsLeaf { get { return (Left == null) && (Right == null); } }
 		public bool IsHalfLeaf { get { return !IsLeaf && ((Left == null) || (Right == null)); } }
-	}
-
-	
+	}	
 }

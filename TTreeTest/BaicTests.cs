@@ -22,7 +22,7 @@ namespace TTreeTest
 			tree.Insert( 7 );
 			tree.Insert( 3 );
 
-			CheckTree( tree, new[] { 3, 5, 7, 10, 15 }, false, false, null );
+			CheckTree( tree, 0, new[] { 3, 5, 7, 10, 15 }, false, false, null );
 		}
 		
 		[TestMethod]
@@ -34,11 +34,11 @@ namespace TTreeTest
 			tree.Insert( 5 );
 			tree.Insert( 15 );
 			tree.Insert( 7 );
-			CheckTree( tree, new[] { 5, 7, 10, 15 }, false, false, null );
+			CheckTree( tree, 0, new[] { 5, 7, 10, 15 }, false, false, null );
 
 			tree.Insert( 2 );
-			CheckTree( tree, new[] { 5, 7, 10, 15 }, true, false, null );
-			CheckTree( tree.Left, new[] { 2 }, false, false, tree );
+			CheckTree( tree, 1, new[] { 5, 7, 10, 15 }, true, false, null );
+			CheckTree( tree.Left, 0, new[] { 2 }, false, false, tree );
 		}
 
 		[TestMethod]
@@ -50,15 +50,16 @@ namespace TTreeTest
 			tree.Insert( 2 );
 			tree.Insert( 15 );
 			tree.Insert( 7 );
-			CheckTree( tree, new[] { 2, 7, 10, 15 }, false, false, null );
+			CheckTree( tree, 0, new[] { 2, 7, 10, 15 }, false, false, null );
 
 			tree.Insert( 8 );
-			CheckTree( tree, new[] { 7, 8, 10, 15 }, true, false, null );
-			CheckTree( tree.Left, new[] { 2 }, false, false, tree );
+			CheckTree( tree, 1, new[] { 7, 8, 10, 15 }, true, false, null );
+			CheckTree( tree.Left, 0, new[] { 2 }, false, false, tree );
 		}
 
 		private void CheckTree<T>(
 			Tree<T> tree,
+			int height,
 			T[] data,
 			bool hasLeft,
 			bool hasRight,
@@ -78,6 +79,7 @@ namespace TTreeTest
 			Assert.AreEqual( hasLeft, (tree.Left != null), "Invalid has left value" );
 			Assert.AreEqual( hasRight, (tree.Right != null), "Invalid has right value" );
 			Assert.AreSame( parent, tree.Parent, "Incorrect parent node" );
+			Assert.AreEqual( height, tree.Height, "Invalid height" );
 		}
 
 		public TestContext TestContext { get; set; }
