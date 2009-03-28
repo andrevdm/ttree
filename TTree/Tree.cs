@@ -244,7 +244,7 @@ namespace TTree
 				}
 			}
 
-			dot.AppendFormat( " }} | {{ <left> . | <m> h={0} | <right> . }} }}\"];", Height ).AppendLine();
+			dot.AppendFormat( " }} | {{ <left> . | <m> h={0}, bf={1} | <right> . }} }}\"];", Height, BalanceFactor ).AppendLine();
 
 			if( Left != null )
 				Left.ToDot( dot, toString );
@@ -300,6 +300,24 @@ namespace TTree
 			if( (Parent != null) && (oldHeight != m_height) )
 			{
 				Parent.UpdateHeight();
+			}
+		}
+
+		public int BalanceFactor
+		{
+			get
+			{
+				if( Count == 0 )
+				{
+					return 0;
+				}
+				else
+				{
+					int lheight = (Left != null) ? (Left.Height) : -1;
+					int rheight = (Right != null) ? (Right.Height) : -1;
+
+					return lheight - rheight;
+				}
 			}
 		}
 
