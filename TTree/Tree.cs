@@ -282,6 +282,8 @@ namespace TTree
 
 		private void UpdateHeight()
 		{
+			int oldHeight = m_height;
+
 			if( Count == 0 )
 			{
 				m_height = -1;
@@ -292,6 +294,12 @@ namespace TTree
 				int rheight = (Right != null) ? (Right.Height) : -1;
 
 				m_height = 1 + Math.Max( lheight, rheight );
+			}
+
+			//If the height was changed, updated the parent nodes height too
+			if( (Parent != null) && (oldHeight != m_height) )
+			{
+				Parent.UpdateHeight();
 			}
 		}
 
