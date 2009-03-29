@@ -70,6 +70,7 @@ namespace TTreeTest
 			CheckTree( tree.Left, 0, new[] { 3 }, false, false, tree );
 
 			tree.Insert( 2 );
+			tree = tree.Root;
 			CheckTree( tree, 1, new[] { 3 }, true, true, null );
 			CheckTree( tree.Left, 0, new[] { 2 }, false, false, tree );
 			CheckTree( tree.Right, 0, new[] { 5 }, false, false, tree );
@@ -88,6 +89,7 @@ namespace TTreeTest
 			CheckTree( tree.Right, 0, new[] { 5 }, false, false, tree );
 
 			tree.Insert( 7 );
+			tree = tree.Root;
 			CheckTree( tree, 1, new[] { 5 }, true, true, null );
 			CheckTree( tree.Left, 0, new[] { 3 }, false, false, tree );
 			CheckTree( tree.Right, 0, new[] { 7 }, false, false, tree );

@@ -125,8 +125,9 @@ namespace TTree
 						Debug.Assert( Left == null, "The right node should be null" );
 						Right = newChild;
 					}
-					
+
 					UpdateHeight();
+					Rebalance( true );
 				}
 			}
 
@@ -183,10 +184,112 @@ namespace TTree
 				m_data[ closest - 1 ] = item;
 			}
 
+			Rebalance( true );
 			return true;
 		}
 
-		//private virtual Rebalance
+		private void Rebalance( bool stopAfterFirstRotate )
+		{
+			if( BalanceFactor > 1 )
+			{
+				if( (Right != null) && (Right.BalanceFactor < -1) )
+				{
+					RotateRL();
+
+					if( stopAfterFirstRotate )
+						return;
+				}
+				else
+				{
+					RotateLL();
+
+					if( stopAfterFirstRotate )
+						return;
+				}
+			}
+			else if( BalanceFactor < -1 )
+			{
+				if( (Left != null) && (Left.BalanceFactor > 1) )
+				{
+					RotateRL();
+
+					if( stopAfterFirstRotate )
+						return;
+				}
+				else
+				{
+					RotateRR();
+
+					if( stopAfterFirstRotate )
+						return;
+				}
+			}
+
+			if( Parent != null )
+			{
+				Parent.Rebalance( true );
+			}
+		}
+
+		private void RotateRL()
+		{
+		}
+
+		private void RotateRR()
+		{
+			Tree<T> b = Right;
+			Tree<T> c = b.Left;
+
+			if( Parent != null )
+			{
+				if( Parent.Left == this )
+					Parent.Left = b;
+				else
+					Parent.Right = b;
+			}
+
+			b.Parent = Parent;
+			b.Left = this;
+			Parent = b;
+			Right = c;
+
+			if( c != null )
+			{
+				c.Parent = this;
+			}
+
+			UpdateHeight();
+		}
+
+		private void RotateLR()
+		{
+		}
+
+		private void RotateLL()
+		{
+			Tree<T> left = Left;
+			Tree<T> leftsRight = left.Right;
+
+			if( Parent != null )
+			{
+				if( Parent.Left == this )
+					Parent.Left = left;
+				else
+					Parent.Right = left;
+			}
+
+			left.Parent = Parent;
+			left.Right = this;
+			Parent = left;
+			Left = leftsRight;
+
+			if( leftsRight != null )
+			{
+				leftsRight.Parent = this;
+			}
+
+			UpdateHeight();
+		}
 
 		public void Delete( T item )
 		{
@@ -331,6 +434,7 @@ namespace TTree
 		public Tree<T> Left { get; set; }
 		public Tree<T> Right { get; set; }
 		public Tree<T> Parent { get; set; }
+		public Tree<T> Root { get { return Parent == null ? this : Parent.Root; } }
 		public bool IsLeaf { get { return (Left == null) && (Right == null); } }
 		public bool IsHalfLeaf { get { return !IsLeaf && ((Left == null) || (Right == null)); } }
 	}	
