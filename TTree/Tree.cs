@@ -62,15 +62,25 @@ namespace TTree
 					//Add the old minimum
 					if( Left == null )
 					{
-						//There is no left child, so create on
+						//There is no left child, so create it
 						Left = CreateChild( oldMinimum );
 						UpdateHeight();
+						Rebalance( true );
 						return true;
 					}
 					else
 					{
 						//Add the old minimum to the left child
-						return Left.Insert( oldMinimum );
+						if( Left.Insert( oldMinimum ) )
+						{
+							UpdateHeight();
+							Rebalance( true );
+							return true;
+						}
+						else
+						{
+							return false;
+						}
 					}
 				}
 			}
@@ -78,11 +88,33 @@ namespace TTree
 			{
 				//If the item is less than the minimum and there is a left node, follow it
 				if( (Left != null) && (item.CompareTo( m_data[ 0 ] ) < 0) )
-					return Left.Insert( item );
+				{
+					if( Left.Insert( item ) )
+					{
+						UpdateHeight();
+						Rebalance( true );
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				}
 
 				//If the item is less than the maximum and there is a right node, follow it
 				if( (Right != null) && (item.CompareTo( m_data[ 0 ] ) > 0) )
-					return Right.Insert( item );
+				{
+					if( Right.Insert( item ) )
+					{
+						UpdateHeight();
+						Rebalance( true );
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+				}
 
 
 				//If we are here then, there is no bounding node for this value.
@@ -128,6 +160,7 @@ namespace TTree
 
 					UpdateHeight();
 					Rebalance( true );
+					return true;
 				}
 			}
 
@@ -192,16 +225,16 @@ namespace TTree
 		{
 			if( BalanceFactor > 1 )
 			{
-				if( (Right != null) && (Right.BalanceFactor < -1) )
+				if( Left.BalanceFactor > 0 )
 				{
-					RotateRL();
+					RotateLL();
 
 					if( stopAfterFirstRotate )
 						return;
 				}
 				else
 				{
-					RotateLL();
+					RotateLR();
 
 					if( stopAfterFirstRotate )
 						return;
@@ -209,22 +242,22 @@ namespace TTree
 			}
 			else if( BalanceFactor < -1 )
 			{
-				if( (Left != null) && (Left.BalanceFactor > 1) )
-				{
-					RotateRL();
-
-					if( stopAfterFirstRotate )
-						return;
-				}
-				else
+				if( Right.BalanceFactor < 0 )
 				{
 					RotateRR();
 
 					if( stopAfterFirstRotate )
 						return;
 				}
-			}
+				else
+				{
+					RotateRL();
 
+					if( stopAfterFirstRotate )
+						return;
+				}
+			}
+			
 			if( Parent != null )
 			{
 				Parent.Rebalance( true );
@@ -233,6 +266,14 @@ namespace TTree
 
 		private void RotateRL()
 		{
+			Right.RotateLL();
+			RotateRR();
+		}
+
+		private void RotateLR()
+		{
+			Left.RotateRR();
+			RotateLL();
 		}
 
 		private void RotateRR()
@@ -259,10 +300,6 @@ namespace TTree
 			}
 
 			UpdateHeight();
-		}
-
-		private void RotateLR()
-		{
 		}
 
 		private void RotateLL()
