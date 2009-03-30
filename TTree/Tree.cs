@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using System.Collections;
 
 namespace TTree
 {
@@ -255,7 +256,7 @@ namespace TTree
 						return;
 				}
 			}
-			
+
 			if( Parent != null )
 			{
 				Parent.Rebalance( true );
@@ -331,16 +332,84 @@ namespace TTree
 			throw new NotImplementedException();
 		}
 
+		/*public T Search( object item, IComparer comparer )
+		{
+			if( Count == 0 )
+				return default( T );
+
+			int compare = comparer.Compare( item, m_data[ 0 ] );
+
+			if( compare == 0 )
+				return m_data[ 0 ];
+
+			if( compare < 0 )
+			{
+				if( Left != null )
+					return Left.Search( item, comparer );
+				else
+					return default( T );
+			}
+
+			compare = comparer.Compare( item, m_data[ Count - 1 ] );
+
+			if( compare == 0 )
+				return m_data[ Count - 1 ];
+
+			if( compare > 0 )
+			{
+				if( Right != null )
+					return Right.Search( item, comparer );
+				else
+					return default( T );
+			}
+
+			int closest = Array.BinarySearch<T>( m_data, 0, Count, item, comparer );
+
+			if( closest >= 0 )
+				return m_data[ closest ];
+
+			return default( T );
+		}  */
+
 		public T Search( T item )
 		{
-			//Array.BinarySearch<T>( m_data, 
+			//TODO share code with Search( item, comparer );
 
-			throw new NotImplementedException();
-		}
+			if( Count == 0 )
+				return default( T );
 
-		public T Search( Func<T, bool> match )
-		{
-			throw new NotImplementedException();
+			int compare = item.CompareTo( m_data[ 0 ] );
+
+			if( compare == 0 )
+				return m_data[ 0 ];
+
+			if( compare < 0 )
+			{
+				if( Left != null )
+					return Left.Search( item );
+				else
+					return default( T );
+			}
+
+			compare = item.CompareTo( m_data[ Count - 1 ] );
+
+			if( compare == 0 )
+				return m_data[ Count - 1 ];
+
+			if( compare > 0 )
+			{
+				if( Right != null )
+					return Right.Search( item );
+				else
+					return default( T );
+			}
+
+			int closest = Array.BinarySearch<T>( m_data, 0, Count, item );
+
+			if( closest >= 0 )
+				return m_data[ closest ];
+
+			return default( T );
 		}
 
 		public void CopyItems( T[] destinationArray, int index )
@@ -353,7 +422,7 @@ namespace TTree
 			return ToDot( i => i.ToString() );
 		}
 
-		public string ToDot( Func<T,string> toString )
+		public string ToDot( Func<T, string> toString )
 		{
 			var dot = new StringBuilder();
 
@@ -365,7 +434,7 @@ namespace TTree
 			return dot.ToString();
 		}
 
-		private void ToDot( StringBuilder dot, Func<T,string> toString )
+		private void ToDot( StringBuilder dot, Func<T, string> toString )
 		{
 			dot.AppendFormat( "	struct{0} [shape=record, label=\"{{ {{ ", GetHashCode().ToString( "X" ) );
 
@@ -472,5 +541,5 @@ namespace TTree
 		public Tree<T> Root { get { return Parent == null ? this : Parent.Root; } }
 		public bool IsLeaf { get { return (Left == null) && (Right == null); } }
 		public bool IsHalfLeaf { get { return !IsLeaf && ((Left == null) || (Right == null)); } }
-	}	
+	}
 }

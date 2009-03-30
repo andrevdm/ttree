@@ -55,6 +55,7 @@ namespace TTreeProfiler
 		{
 			var sortedCombined = (from c in combined orderby c.Value select new { c.Key, c.Value });
 			long maxDescLen = (from i in combined.Keys select i.Length).Max();
+			double maxResultPercent = (from i in combined.Values select i).Max();
 
 			Console.WriteLine( "----------" );
 			Console.ForegroundColor = ConsoleColor.Yellow;
@@ -64,7 +65,9 @@ namespace TTreeProfiler
 
 			foreach( var combinedResult in sortedCombined )
 			{
-				string bar = DrawBar( combinedResult.Value / 100, 110 );
+				double percent = combinedResult.Value / maxResultPercent;
+
+				string bar = DrawBar( percent, 110 );
 
 				Console.Write( "{0," + maxDescLen + "}", combinedResult.Key );
 
@@ -72,7 +75,7 @@ namespace TTreeProfiler
 				Console.Write( " {0} ", bar );
 				Console.ForegroundColor = ConsoleColor.Gray;
 
-				Console.Write( " {0,7:F2}%", combinedResult.Value );
+				Console.Write( " {0,7:F2}%", percent * 100 );
 				Console.WriteLine();
 			}
 		}

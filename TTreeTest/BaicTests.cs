@@ -5,9 +5,10 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using TTree;
+using System.Collections;
 
 namespace TTreeTest
-{										 
+{
 	[TestClass]
 	public class BaicTests
 	{
@@ -24,7 +25,7 @@ namespace TTreeTest
 
 			CheckTree( tree, 0, new[] { 3, 5, 7, 10, 15 }, false, false, null );
 		}
-		
+
 		[TestMethod]
 		public void Insert_FullRoot_OverflowLeftToNewNode_LastNodeIsNotBounding()
 		{
@@ -133,6 +134,22 @@ namespace TTreeTest
 			CheckTree( tree.Right, 0, new[] { 5 }, false, false, tree );
 		}
 
+		[TestMethod]
+		public void Search()
+		{
+			var tree = new Tree<int>( 1, 1 );
+
+			tree.Insert( 70 );
+			tree.Insert( 20 );
+			tree.Insert( 10 );
+			tree.Insert( 50 );
+			tree.Insert( 90 );
+
+			tree = tree.Root;
+			int i = tree.Search( 90 );
+			Assert.AreEqual( 90, i );
+		}
+
 		private void CheckTree<T>(
 			Tree<T> tree,
 			int height,
@@ -145,7 +162,7 @@ namespace TTreeTest
 			Assert.AreEqual( data.Length, tree.Count, "Invalid count" );
 
 			T[] values = new T[ tree.MaxItems ];
-			tree.CopyItems( values, 0 ); 
+			tree.CopyItems( values, 0 );
 
 			for( int i = 0; i < data.Length; ++i )
 			{

@@ -22,7 +22,7 @@ namespace TTreeProfiler
 			Console.WriteLine( "Values created, profiling" );
 
 			//int seconds = 5;
-			int seconds = 1;
+			int seconds = 10;
 
 			var profiler = new Profiler();
 
@@ -32,25 +32,19 @@ namespace TTreeProfiler
 			profiler.AddCombine( "add", 35 );
 			profiler.AddCombine( "search", 65 );
 
-			var ttree1 = new Tree<string>( 97, 100 );
-			profiler.Add( "add", "T-Tree(97-100)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree1.Insert( s ), values.Count, i ) );
-			profiler.Add( "search", "T-Tree(97-100)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree1.Search( s ), ttree1.Count - 1, i ) );
+			int[][] ttreeOrders = new int[][] { new[] { 97, 100 }, new[] { 17, 20 }, new[] { 7, 10 }, new[] { 497, 500 }, new[] { 2000, 2003 }, };
+			List<Tree<string>> trees = new List<Tree<string>>();
 
-			var ttree2 = new Tree<string>( 17, 20 );
-			profiler.Add( "add", "T-Tree(17-20)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree2.Insert( s ), values.Count, i ) );
-			profiler.Add( "search", "T-Tree(17-20)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree2.Search( s ), ttree2.Count - 1, i ) );
+			for( int tpos = 0; tpos < ttreeOrders.Length; ++tpos )
+			{
+				int pos = tpos;
+				var order = ttreeOrders[ pos ];
+				string name = string.Format( "{0}-{1}", order[ 0 ], order[ 1 ] );
 
-			var ttree3 = new Tree<string>( 497, 500 );
-			profiler.Add( "add", "T-Tree(497-500)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree3.Insert( s ), values.Count, i ) );
-			profiler.Add( "search", "T-Tree(497-500)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree3.Search( s ), ttree3.Count - 1, i ) );
-
-			var ttree4 = new Tree<string>( 7, 10 );
-			profiler.Add( "add", "T-Tree(7-10)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree4.Insert( s ), values.Count, i ) );
-			profiler.Add( "search", "T-Tree(7-10)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree4.Search( s ), ttree4.Count - 1, i ) );
-
-			var ttree5 = new Tree<string>( 2000, 2003 );
-			profiler.Add( "add", "T-Tree(2000-2003)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree5.Insert( s ), values.Count, i ) );
-			profiler.Add( "search", "T-Tree(2000-2003)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree5.Search( s ), ttree5.Count - 1, i ) );
+				trees.Add( new Tree<string>( order[ 0 ], order[ 1 ] ) );
+				profiler.Add( "add", "T-Tree(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Insert( s ), values.Count, i ) );
+				profiler.Add( "search", "T-Tree(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Search( s ), trees[ pos ].Count - 1, i ) );
+			}
 
 			var list = new List<string>();
 			profiler.Add( "add", "List<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => list.Add( s ), values.Count, i ) );
@@ -72,19 +66,19 @@ namespace TTreeProfiler
 			profiler.Add( "add", "array[]", i => Time( values, seconds, i.Desc + " - " + i.Group, s => array[ i.Count ] = s, values.Count, i ) );
 			profiler.Add( "search", "array[]", i => Time( values, seconds, i.Desc + " - " + i.Group, s => { var x = (from a in array where a == s select a).First(); }, array.Length - 1, i ) );
 
-			var binTree = new BinarySearchTree<string,string>();
+			var binTree = new BinarySearchTree<string, string>();
 			profiler.Add( "add", "BinarySearchTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => binTree.Add( s, s ), values.Count, i ) );
 			profiler.Add( "search", "BinarySearchTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => { string x = binTree[ s ]; }, binTree.Count - 1, i ) );
 
 			var redBlackTree = new RedBlackTree<string, string>();
 			profiler.Add( "add", "RedBlackTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => redBlackTree.Add( s, s ), values.Count, i ) );
 			profiler.Add( "search", "RedBlackTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => { string x = redBlackTree[ s ]; }, redBlackTree.Count - 1, i ) );
-			
+
 			profiler.Profile();
 			Console.WriteLine();
 			Console.WriteLine( "----" );
 			Console.WriteLine();
-			profiler.PrintResults(); 
+			profiler.PrintResults();
 		}
 
 		private static void Time( List<Guid> values, int seconds, string desc, Action<string> method, int modCount, Item item )
@@ -145,5 +139,5 @@ namespace TTreeProfiler
 		}
 	}
 
-	
+
 }
