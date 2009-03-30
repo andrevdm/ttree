@@ -1,0 +1,4 @@
+1 - Special case rotation
+2 - Check performance
+3 - Look at key-value pair
+4 - Compare performance	
