@@ -29,12 +29,28 @@ namespace TTreeProfiler
 			//profiler.AddCombine( "add", 20 );
 			//profiler.AddCombine( "del", 20 );
 			//profiler.AddCombine( "search", 60 );
-			profiler.AddCombine( "add", 50 );
-			profiler.AddCombine( "search", 50 );
+			profiler.AddCombine( "add", 35 );
+			profiler.AddCombine( "search", 65 );
 
-			//var ttree = new Tree<string>( 97, 100 );
-			//profiler.Add( "add", "T-Tree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree.Insert( s ), values.Count, i ) );
-			//profiler.Add( "search", "T-Tree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree.Search( s ), ttree.Count - 1, i ) );
+			var ttree1 = new Tree<string>( 97, 100 );
+			profiler.Add( "add", "T-Tree(97-100)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree1.Insert( s ), values.Count, i ) );
+			profiler.Add( "search", "T-Tree(97-100)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree1.Search( s ), ttree1.Count - 1, i ) );
+
+			var ttree2 = new Tree<string>( 17, 20 );
+			profiler.Add( "add", "T-Tree(17-20)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree2.Insert( s ), values.Count, i ) );
+			profiler.Add( "search", "T-Tree(17-20)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree2.Search( s ), ttree2.Count - 1, i ) );
+
+			var ttree3 = new Tree<string>( 497, 500 );
+			profiler.Add( "add", "T-Tree(497-500)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree3.Insert( s ), values.Count, i ) );
+			profiler.Add( "search", "T-Tree(497-500)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree3.Search( s ), ttree3.Count - 1, i ) );
+
+			var ttree4 = new Tree<string>( 7, 10 );
+			profiler.Add( "add", "T-Tree(7-10)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree4.Insert( s ), values.Count, i ) );
+			profiler.Add( "search", "T-Tree(7-10)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree4.Search( s ), ttree4.Count - 1, i ) );
+
+			var ttree5 = new Tree<string>( 2000, 2003 );
+			profiler.Add( "add", "T-Tree(2000-2003)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree5.Insert( s ), values.Count, i ) );
+			profiler.Add( "search", "T-Tree(2000-2003)", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree5.Search( s ), ttree5.Count - 1, i ) );
 
 			var list = new List<string>();
 			profiler.Add( "add", "List<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => list.Add( s ), values.Count, i ) );
@@ -117,6 +133,14 @@ namespace TTreeProfiler
 			public int CompareTo( StringStruct obj )
 			{
 				return value.CompareTo( obj.value );
+			}
+		}
+
+		private class StringComparer : IComparer<string>
+		{
+			public int Compare( string x, string y )
+			{
+				return x.CompareTo( y );
 			}
 		}
 	}
