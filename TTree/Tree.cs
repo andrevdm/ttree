@@ -149,12 +149,12 @@ namespace TTree
 					//Add it as the the left or the right child
 					if( item.CompareTo( m_data[ 0 ] ) < 0 )
 					{
-						Debug.Assert( Left == null, "The left node should be null" );
+						//Debug.Assert( Left == null, "The left node should be null" );
 						Left = newChild;
 					}
 					else
 					{
-						Debug.Assert( Left == null, "The right node should be null" );
+						//Debug.Assert( Left == null, "The right node should be null" );
 						Right = newChild;
 					}
 
