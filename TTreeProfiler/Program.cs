@@ -21,12 +21,20 @@ namespace TTreeProfiler
 			Console.WriteLine();
 			Console.WriteLine( "Values created, profiling" );
 
-			int seconds = 2;
+			//int seconds = 5;
+			int seconds = 1;
 
 			var profiler = new Profiler();
 
-			//var ttree = new Tree<string>( 8, 10 );
-			//Time( seconds, "T-Tree", s => ttree.Insert( s ), s => ttree.Search( s ) );
+			//profiler.AddCombine( "add", 20 );
+			//profiler.AddCombine( "del", 20 );
+			//profiler.AddCombine( "search", 60 );
+			profiler.AddCombine( "add", 50 );
+			profiler.AddCombine( "search", 50 );
+
+			//var ttree = new Tree<string>( 97, 100 );
+			//profiler.Add( "add", "T-Tree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree.Insert( s ), values.Count, i ) );
+			//profiler.Add( "search", "T-Tree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => ttree.Search( s ), ttree.Count - 1, i ) );
 
 			var list = new List<string>();
 			profiler.Add( "add", "List<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => list.Add( s ), values.Count, i ) );
@@ -55,7 +63,7 @@ namespace TTreeProfiler
 			var redBlackTree = new RedBlackTree<string, string>();
 			profiler.Add( "add", "RedBlackTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => redBlackTree.Add( s, s ), values.Count, i ) );
 			profiler.Add( "search", "RedBlackTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => { string x = redBlackTree[ s ]; }, redBlackTree.Count - 1, i ) );
-
+			
 			profiler.Profile();
 			Console.WriteLine();
 			Console.WriteLine( "----" );
@@ -94,12 +102,24 @@ namespace TTreeProfiler
 			for( int i = 0; i < max; ++i )
 			{
 				if( i % 1000000 == 0 )
-					Console.WriteLine( "{0:F2}%", ((float)i / (float)max) * 100 );
+					Console.WriteLine( "{0:F2}%", ((double)i / (double)max) * 100 );
 
 				items.Add( Guid.NewGuid() );
 			}
 
 			return items;
 		}
+
+		private struct StringStruct : IComparable<StringStruct>
+		{
+			public string value { get; set; }
+
+			public int CompareTo( StringStruct obj )
+			{
+				return value.CompareTo( obj.value );
+			}
+		}
 	}
+
+	
 }

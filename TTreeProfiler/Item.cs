@@ -12,5 +12,7 @@ namespace TTreeProfiler
 		public long Count { get; set; }
 		public TimeSpan Elapsed { get; set; }
 		public Action<Item> Method { get; set; }
+		public double Percent { get; set; }
+		public double CombinedPercent { get; set; }
 	}
 }

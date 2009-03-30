@@ -8,10 +8,16 @@ namespace TTreeProfiler
 	public class Profiler
 	{
 		private List<Item> m_items = new List<Item>();
+		private Dictionary<string, int> m_combine = new Dictionary<string, int>();
 
 		public void Add( string group, string desc, Action<Item> method )
 		{
 			m_items.Add( new Item { Group = group, Desc = desc, Count = 0, Method = method } );
+		}
+
+		public void AddCombine( string group, int percent )
+		{
+			m_combine[ group ] = percent;
 		}
 
 		public void Profile()
@@ -30,6 +36,69 @@ namespace TTreeProfiler
 			{
 				PrintResults( group );
 			}
+
+			ProcessCombinedResult();
+		}
+
+		private void ProcessCombinedResult()
+		{
+			var descs = (from i in m_items select i.Desc).Distinct();
+			var combined = new Dictionary<string, double>();
+
+			if( !BuildCombinedResult( descs, combined ) )
+				return;
+
+			PrintCombinedResults( combined );
+		}
+
+		private void PrintCombinedResults( Dictionary<string, double> combined )
+		{
+			var sortedCombined = (from c in combined orderby c.Value select new { c.Key, c.Value });
+			long maxDescLen = (from i in combined.Keys select i.Length).Max();
+
+			Console.WriteLine( "----------" );
+			Console.ForegroundColor = ConsoleColor.Yellow;
+			Console.WriteLine( "Combined" );
+			Console.ForegroundColor = ConsoleColor.Gray;
+			Console.WriteLine( "----------" );
+
+			foreach( var combinedResult in sortedCombined )
+			{
+				string bar = DrawBar( combinedResult.Value / 100, 110 );
+
+				Console.Write( "{0," + maxDescLen + "}", combinedResult.Key );
+
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.Write( " {0} ", bar );
+				Console.ForegroundColor = ConsoleColor.Gray;
+
+				Console.Write( " {0,7:F2}%", combinedResult.Value );
+				Console.WriteLine();
+			}
+		}
+
+		private bool BuildCombinedResult( IEnumerable<string> descs, Dictionary<string, double> combined )
+		{
+			foreach( var desc in descs )
+			{
+				foreach( KeyValuePair<string, int> kv in m_combine )
+				{
+					Item item = (from i in m_items where i.Group == kv.Key where i.Desc == desc select i).First();
+
+					if( item == null )
+					{
+						Console.WriteLine( "{0}.{1} missing combined results will not be displayed", item.Group, item.Desc );
+						return false;
+					}
+
+					if( !combined.ContainsKey( item.Desc ) )
+						combined[ item.Desc ] = 0;
+
+					combined[ item.Desc ] += (item.Percent * 100) * ((double)kv.Value / 100);
+				}
+			}
+
+			return true;
 		}
 
 		private void PrintResults( string grp )
@@ -48,9 +117,10 @@ namespace TTreeProfiler
 			Console.WriteLine( new string( '-', grp.Length + 1 ) );
 			foreach( var result in results )
 			{
-				float percent = result.Count / (float)maxCount;
+				double percent = result.Count / (double)maxCount;
+				result.Percent = percent;
 
-				string bar = DrawBar( percent, 90 );
+				string bar = DrawBar( percent, 110 );
 
 				Console.Write( "{0," + maxDescLen + "}", result.Desc );
 
@@ -68,10 +138,10 @@ namespace TTreeProfiler
 			Console.WriteLine();
 		}
 
-		private string DrawBar( float percent, int len )
+		private string DrawBar( double percent, int len )
 		{
 			var bar = new StringBuilder();
-			int chars = (int)(percent * (float)len);
+			int chars = (int)(percent * (double)len);
 
 			bar.Append( "[" );
 			for( int i = 0; i < len; ++i )
