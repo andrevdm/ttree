@@ -146,8 +146,30 @@ namespace TTreeTest
 			tree.Insert( 90 );
 
 			tree = tree.Root;
-			int i = tree.Search( 90 );
-			Assert.AreEqual( 90, i );
+			Assert.AreEqual( 90, tree.Search( 90 ) );
+			Assert.AreEqual( 70, tree.Search( 70 ) );
+			Assert.AreEqual( 50, tree.Search( 50 ) );
+			Assert.AreEqual( 20, tree.Search( 20 ) );
+			Assert.AreEqual( 10, tree.Search( 10 ) );
+		}
+
+		[TestMethod]
+		public void CustomSearch()
+		{
+			var tree = new Tree<string>( 1, 1 );
+
+			tree.Insert( "70" );
+			tree.Insert( "20" );
+			tree.Insert( "10" );
+			tree.Insert( "50" );
+			tree.Insert( "90" );
+
+			tree = tree.Root;
+			Assert.AreEqual( "90", tree.Search( 90, ( x, y ) => x.ToString().CompareTo( y ) ) );
+			Assert.AreEqual( "70", tree.Search( 70, ( x, y ) => x.ToString().CompareTo( y ) ) );
+			Assert.AreEqual( "50", tree.Search( 50, ( x, y ) => x.ToString().CompareTo( y ) ) );
+			Assert.AreEqual( "20", tree.Search( 20, ( x, y ) => x.ToString().CompareTo( y ) ) );
+			Assert.AreEqual( "10", tree.Search( 10, ( x, y ) => x.ToString().CompareTo( y ) ) );
 		}
 
 		private void CheckTree<T>(

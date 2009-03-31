@@ -332,12 +332,19 @@ namespace TTree
 			throw new NotImplementedException();
 		}
 
-		/*public T Search( object item, IComparer comparer )
+		/// <summary>
+		/// Search for an item using a custom comparison function
+		/// </summary>
+		/// <typeparam name="TSearch">The type of the search.</typeparam>
+		/// <param name="item">The item.</param>
+		/// <param name="comparer">The comparer.</param>
+		/// <returns></returns>
+		public T Search<TSearch>( TSearch item, Func<TSearch,T,int> comparer )
 		{
 			if( Count == 0 )
 				return default( T );
 
-			int compare = comparer.Compare( item, m_data[ 0 ] );
+			int compare = comparer( item, m_data[ 0 ] );
 
 			if( compare == 0 )
 				return m_data[ 0 ];
@@ -350,7 +357,7 @@ namespace TTree
 					return default( T );
 			}
 
-			compare = comparer.Compare( item, m_data[ Count - 1 ] );
+			compare = comparer( item, m_data[ Count - 1 ] );
 
 			if( compare == 0 )
 				return m_data[ Count - 1 ];
@@ -363,17 +370,22 @@ namespace TTree
 					return default( T );
 			}
 
-			int closest = Array.BinarySearch<T>( m_data, 0, Count, item, comparer );
+			int closest = BinarySearch<TSearch>( m_data, 0, Count, item, comparer );
 
 			if( closest >= 0 )
 				return m_data[ closest ];
 
 			return default( T );
-		}  */
+		}
 
+		/// <summary>
+		/// Searches for the specified item.
+		/// </summary>
+		/// <param name="item">The item.</param>
+		/// <returns></returns>
 		public T Search( T item )
 		{
-			//TODO share code with Search( item, comparer );
+			//This code is not shared with the other Search() method to keep things as fast as possible
 
 			if( Count == 0 )
 				return default( T );
@@ -508,6 +520,38 @@ namespace TTree
 			{
 				Parent.UpdateHeight();
 			}
+		}
+
+		/// <summary>
+		/// Binary search implementation using a custom compare function
+		/// </summary>
+		/// <typeparam name="TSearch">The type of the search.</typeparam>
+		/// <param name="array">The array.</param>
+		/// <param name="index">The index.</param>
+		/// <param name="length">The length.</param>
+		/// <param name="value">The value.</param>
+		/// <param name="comparer">The comparer.</param>
+		/// <returns></returns>
+		private int BinarySearch<TSearch>( T[] array, int index, int length, TSearch value, Func<TSearch, T, int> comparer )
+		{
+			int num1 = index;
+			int num2 = (index + length) - 1;
+
+			while( num1 <= num2 )
+			{
+				int num3 = num1 + ((num2 - num1) >> 1);
+				int num4 = -comparer( value, array[ num3 ] );
+
+				if( num4 == 0 )
+					return num3;
+
+				if( num4 < 0 )
+					num1 = num3 + 1;
+				else
+					num2 = num3 - 1;
+			}
+
+			return ~num1;
 		}
 
 		public int BalanceFactor
