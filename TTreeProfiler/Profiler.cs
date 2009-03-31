@@ -53,7 +53,7 @@ namespace TTreeProfiler
 
 		private void PrintCombinedResults( Dictionary<string, double> combined )
 		{
-			var sortedCombined = (from c in combined orderby c.Value select new { c.Key, c.Value });
+			var sortedCombined = (from c in combined orderby c.Value descending select new { c.Key, c.Value });
 			long maxDescLen = (from i in combined.Keys select i.Length).Max();
 			double maxResultPercent = (from i in combined.Values select i).Max();
 
@@ -110,7 +110,7 @@ namespace TTreeProfiler
 			long maxDescLen = (from i in m_items where i.Group == grp select i.Desc.Length).Max();
 			long maxCountLen = (from i in m_items where i.Group == grp select i.Count.ToString().Length).Max();
 
-			var results = (from i in m_items where i.Group == grp orderby i.Count select i);
+			var results = (from i in m_items where i.Group == grp orderby i.Count descending select i);
 
 			Console.WriteLine();
 			Console.WriteLine( new string( '-', grp.Length + 1 ) );
