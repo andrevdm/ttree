@@ -265,12 +265,42 @@ namespace TTree
 
 		private void RotateRL()
 		{
+			//Check if a T-Tree sliding rotate must be done first.
+			if( IsHalfLeaf && Right.IsHalfLeaf && Right.Left.IsLeaf )
+			{
+				var nodeB = Right;
+				var nodeC = Right.Left;
+
+				int maxLen = m_data.Length;
+				int delta = maxLen - nodeC.Count;
+				Array.Copy( nodeB.m_data, 0, nodeC.m_data, nodeC.Count, delta );
+				Array.Copy( nodeB.m_data, delta, nodeB.m_data, 0, nodeC.Count );
+
+				nodeB.Count = nodeC.Count;
+				nodeC.Count = maxLen;
+			}
+
 			Right.RotateLL();
 			RotateRR();
 		}
 
 		private void RotateLR()
 		{
+			//Check if a T-Tree sliding rotate must be done first.
+			if( IsHalfLeaf && Left.IsHalfLeaf && Left.Right.IsLeaf )
+			{
+				var nodeB = Left;
+				var nodeC = Left.Right;
+
+				int maxLen = m_data.Length;
+				int delta = maxLen - nodeC.Count;
+				Array.Copy( nodeC.m_data, 0, nodeC.m_data, delta, nodeC.Count );
+				Array.Copy( nodeB.m_data, nodeC.Count, nodeC.m_data, 0, delta );
+
+				nodeB.Count = nodeC.Count;
+				nodeC.Count = maxLen;
+			}
+
 			Left.RotateRR();
 			RotateLL();
 		}

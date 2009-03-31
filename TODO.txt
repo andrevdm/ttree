@@ -1,4 +1,2 @@
-1 - Special case rotation
-2 - Check performance
-3 - Look at key-value pair
-4 - Compare performance	
+1 - Delete
+2 - Updates tests 60,20,20

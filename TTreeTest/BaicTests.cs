@@ -135,6 +135,111 @@ namespace TTreeTest
 		}
 
 		[TestMethod]
+		public void Rotate_LR_SlidingRotate()
+		{
+			var tree = new Tree<int>( 3, 3 );
+
+			tree.Insert( 20 );
+			tree.Insert( 21 );
+			tree.Insert( 22 );
+			CheckTree( tree, 0, new[] { 20, 21, 22 }, false, false, null );
+
+			tree.Insert( 10 );
+			tree.Insert( 11 );
+			tree.Insert( 12 );
+			CheckTree( tree, 1, new[] { 20, 21, 22 }, true, false, null );
+			CheckTree( tree.Left, 0, new[] { 10, 11, 12 }, false, false, tree );
+
+			tree.Insert( 15 );
+			tree = tree.Root;
+			CheckTree( tree, 1, new[] { 11, 12, 15 }, true, true, null );
+			CheckTree( tree.Left, 0, new[] { 10 }, false, false, tree );
+			CheckTree( tree.Right, 0, new[] { 20, 21, 22 }, false, false, tree );
+		}
+
+		[TestMethod]
+		public void Rotate_LR_SlidingRotate2()
+		{
+			var tree = new Tree<int>( 6, 6 );
+
+			tree.Insert( 201 );
+			tree.Insert( 202 );
+			tree.Insert( 203 );
+			tree.Insert( 204 );
+			tree.Insert( 205 );
+			tree.Insert( 206 );
+			CheckTree( tree, 0, new[] { 201, 202, 203, 204, 205, 206 }, false, false, null );
+
+			tree.Insert( 101 );
+			tree.Insert( 102 );
+			tree.Insert( 103 );
+			tree.Insert( 104 );
+			tree.Insert( 105 );
+			tree.Insert( 106 );
+			CheckTree( tree, 1, new[] { 201, 202, 203, 204, 205, 206 }, true, false, null );
+			CheckTree( tree.Left, 0, new[] { 101, 102, 103, 104, 105, 106 }, false, false, tree );
+
+			tree.Insert( 115 );
+			tree = tree.Root;
+			CheckTree( tree, 1, new[] { 102, 103, 104, 105, 106, 115 }, true, true, null );
+			CheckTree( tree.Left, 0, new[] { 101 }, false, false, tree );
+			CheckTree( tree.Right, 0, new[] { 201, 202, 203, 204, 205, 206 }, false, false, tree );
+		}
+
+		[TestMethod]
+		public void Rotate_RL_SlidingRotate()
+		{
+			var tree = new Tree<int>( 3, 3 );
+
+			tree.Insert( 30 );
+			tree.Insert( 31 );
+			tree.Insert( 32 );
+			CheckTree( tree, 0, new[] { 30, 31, 32 }, false, false, null );
+
+			tree.Insert( 50 );
+			tree.Insert( 51 );
+			tree.Insert( 52 );
+			CheckTree( tree, 1, new[] { 30, 31, 32 }, false, true, null );
+			CheckTree( tree.Right, 0, new[] { 50, 51, 52 }, false, false, tree );
+
+			tree.Insert( 40 );
+			tree = tree.Root;
+			CheckTree( tree, 1, new[] { 40, 50, 51 }, true, true, null );
+			CheckTree( tree.Left, 0, new[] { 30, 31, 32 }, false, false, tree );
+			CheckTree( tree.Right, 0, new[] { 52 }, false, false, tree );
+		}
+
+		[TestMethod]
+		public void Rotate_RL_SlidingRotate2()
+		{
+			var tree = new Tree<int>( 6, 6 );
+
+			tree.Insert( 30 );
+			tree.Insert( 31 );
+			tree.Insert( 32 );
+			tree.Insert( 33 );
+			tree.Insert( 34 );
+			tree.Insert( 35 );
+			CheckTree( tree, 0, new[] { 30, 31, 32, 33, 34, 35 }, false, false, null );
+
+			tree.Insert( 50 );
+			tree.Insert( 51 );
+			tree.Insert( 52 );
+			tree.Insert( 53 );
+			tree.Insert( 54 );
+			tree.Insert( 55 );
+			CheckTree( tree, 1, new[] { 30, 31, 32, 33, 34, 35 }, false, true, null );
+			CheckTree( tree.Right, 0, new[] { 50, 51, 52, 53, 54, 55 }, false, false, tree );
+
+			tree.Insert( 40 );
+			tree = tree.Root;
+			CheckTree( tree, 1, new[] { 40, 50, 51, 52, 53, 54 }, true, true, null );
+			CheckTree( tree.Left, 0, new[] { 30, 31, 32, 33, 34, 35 }, false, false, tree );
+			CheckTree( tree.Right, 0, new[] { 55 }, false, false, tree );
+		}
+
+
+		[TestMethod]
 		public void Search()
 		{
 			var tree = new Tree<int>( 1, 1 );
