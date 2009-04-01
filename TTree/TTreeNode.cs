@@ -12,14 +12,14 @@ namespace TTree
 	/// Google "A Study of Index Structures for Main Memory Database Management Systems"
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class Tree<T> //visitor, IEnumerable etc
+	public class TreeNode<T> //visitor, IEnumerable etc
 		where T : IComparable
 	{
 		protected readonly T[] m_data;
 		protected readonly int m_minimum;
 		protected int m_height = 0;
 
-		public Tree( int minimum, int maximum )
+		public TreeNode( int minimum, int maximum )
 		{
 			#region param checks
 			if( minimum < 1 )
@@ -145,7 +145,7 @@ namespace TTree
 				}
 				else
 				{
-					Tree<T> newChild = CreateChild( item );
+					TreeNode<T> newChild = CreateChild( item );
 
 					//Add it as the the left or the right child
 					if( item.CompareTo( m_data[ 0 ] ) < 0 )
@@ -307,8 +307,8 @@ namespace TTree
 
 		private void RotateRR()
 		{
-			Tree<T> b = Right;
-			Tree<T> c = b.Left;
+			TreeNode<T> b = Right;
+			TreeNode<T> c = b.Left;
 
 			if( Parent != null )
 			{
@@ -333,8 +333,8 @@ namespace TTree
 
 		private void RotateLL()
 		{
-			Tree<T> left = Left;
-			Tree<T> leftsRight = left.Right;
+			TreeNode<T> left = Left;
+			TreeNode<T> leftsRight = left.Right;
 
 			if( Parent != null )
 			{
@@ -516,10 +516,10 @@ namespace TTree
 		/// </summary>
 		/// <param name="item">The item.</param>
 		/// <returns></returns>
-		private Tree<T> CreateChild( T item )
+		private TreeNode<T> CreateChild( T item )
 		{
 			//Create a new child node
-			Tree<T> newChild = new Tree<T>( m_minimum, m_data.Length );
+			TreeNode<T> newChild = new TreeNode<T>( m_minimum, m_data.Length );
 			newChild.m_data[ 0 ] = item;
 			newChild.Count = 1;
 			newChild.Parent = this;
@@ -609,10 +609,10 @@ namespace TTree
 		public int Height { get { return m_height; } }
 		public int Count { get; protected set; }
 		public int MaxItems { get { return m_data.Length; } }
-		public Tree<T> Left { get; set; }
-		public Tree<T> Right { get; set; }
-		public Tree<T> Parent { get; set; }
-		public Tree<T> Root { get { return Parent == null ? this : Parent.Root; } }
+		public TreeNode<T> Left { get; set; }
+		public TreeNode<T> Right { get; set; }
+		public TreeNode<T> Parent { get; set; }
+		public TreeNode<T> Root { get { return Parent == null ? this : Parent.Root; } }
 		public bool IsLeaf { get { return (Left == null) && (Right == null); } }
 		public bool IsHalfLeaf { get { return !IsLeaf && ((Left == null) || (Right == null)); } }
 		public T this[ int index ] { get { return m_data[ index ]; } }

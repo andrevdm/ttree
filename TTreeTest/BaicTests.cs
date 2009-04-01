@@ -15,7 +15,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void InsertIntoRootWithSpace()
 		{
-			var tree = new Tree<int>( 5, 5 );
+			var tree = new TreeNode<int>( 5, 5 );
 
 			tree.Insert( 10 );
 			tree.Insert( 5 );
@@ -29,7 +29,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void Insert_FullRoot_OverflowLeftToNewNode_LastNodeIsNotBounding()
 		{
-			var tree = new Tree<int>( 4, 4 );
+			var tree = new TreeNode<int>( 4, 4 );
 
 			tree.Insert( 10 );
 			tree.Insert( 5 );
@@ -45,7 +45,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void Insert_FullRoot_OverflowLeftToNewNode_LastNodeIsBounding()
 		{
-			var tree = new Tree<int>( 4, 4 );
+			var tree = new TreeNode<int>( 4, 4 );
 
 			tree.Insert( 10 );
 			tree.Insert( 2 );
@@ -61,7 +61,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void Rotate_LL()
 		{
-			var tree = new Tree<int>( 1, 1 );
+			var tree = new TreeNode<int>( 1, 1 );
 
 			tree.Insert( 5 );
 			CheckTree( tree, 0, new[] { 5 }, false, false, null, 5 );
@@ -80,7 +80,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void Rotate_RR()
 		{
-			var tree = new Tree<int>( 1, 1 );
+			var tree = new TreeNode<int>( 1, 1 );
 
 			tree.Insert( 3 );
 			CheckTree( tree, 0, new[] { 3 }, false, false, null, 3 );
@@ -99,7 +99,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void Rotate_LR()
 		{
-			var tree = new Tree<int>( 1, 1 );
+			var tree = new TreeNode<int>( 1, 1 );
 
 			tree.Insert( 5 );
 			CheckTree( tree, 0, new[] { 5 }, false, false, null, 5 );
@@ -118,7 +118,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void Rotate_RL()
 		{
-			var tree = new Tree<int>( 1, 1 );
+			var tree = new TreeNode<int>( 1, 1 );
 
 			tree.Insert( 3 );
 			CheckTree( tree, 0, new[] { 3 }, false, false, null, 3 );
@@ -137,7 +137,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void Rotate_LR_SlidingRotate()
 		{
-			var tree = new Tree<int>( 3, 3 );
+			var tree = new TreeNode<int>( 3, 3 );
 
 			tree.Insert( 20 );
 			tree.Insert( 21 );
@@ -160,7 +160,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void Rotate_LR_SlidingRotate2()
 		{
-			var tree = new Tree<int>( 6, 6 );
+			var tree = new TreeNode<int>( 6, 6 );
 
 			tree.Insert( 201 );
 			tree.Insert( 202 );
@@ -189,7 +189,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void Rotate_RL_SlidingRotate()
 		{
-			var tree = new Tree<int>( 3, 3 );
+			var tree = new TreeNode<int>( 3, 3 );
 
 			tree.Insert( 30 );
 			tree.Insert( 31 );
@@ -212,7 +212,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void Rotate_RL_SlidingRotate2()
 		{
-			var tree = new Tree<int>( 6, 6 );
+			var tree = new TreeNode<int>( 6, 6 );
 
 			tree.Insert( 30 );
 			tree.Insert( 31 );
@@ -241,7 +241,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void Search()
 		{
-			var tree = new Tree<int>( 1, 1 );
+			var tree = new TreeNode<int>( 1, 1 );
 
 			tree.Insert( 70 );
 			tree.Insert( 20 );
@@ -260,7 +260,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void CustomSearch()
 		{
-			var tree = new Tree<string>( 1, 1 );
+			var tree = new TreeNode<string>( 1, 1 );
 
 			tree.Insert( "70" );
 			tree.Insert( "20" );
@@ -279,7 +279,7 @@ namespace TTreeTest
 		[TestMethod]
 		public void CheckThatAllInsertedItemsExist()
 		{
-			var tree = new Tree<int>( 20, 23 );
+			var tree = new TreeNode<int>( 20, 23 );
 
 			for( int i = 0; i < 1000; ++i )
 			{
@@ -296,12 +296,12 @@ namespace TTreeTest
 
 
 		private void CheckTree<T>(
-			Tree<T> tree,
+			TreeNode<T> tree,
 			int height,
 			T[] data,
 			bool hasLeft,
 			bool hasRight,
-			Tree<T> parent,
+			TreeNode<T> parent,
 			T root1stItem )
 			where T : IComparable
 		{
