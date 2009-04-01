@@ -23,8 +23,8 @@ namespace TTreeProfiler
 			Console.WriteLine();
 			Console.WriteLine( "Values created, profiling" );
 
-			int seconds = 1;
-			//int seconds = 10;
+			//int seconds = 1;
+			int seconds = 2;
 
 			var profiler = new Profiler();
 
@@ -35,7 +35,7 @@ namespace TTreeProfiler
 			profiler.AddCombine( "search", 75 );
 
 			int[][] ttreeOrders = new int[][] { new[] { 40, 43 }, new[] { 97, 100 }, new[] { 17, 20 }, new[] { 7, 10 }, new[] { 497, 500 }, new[] { 2000, 2003 }, };
-			List<Tree<string>> trees = new List<Tree<string>>();
+			List<TreeNode<string>> trees = new List<TreeNode<string>>();
 
 			for( int tpos = 0; tpos < ttreeOrders.Length; ++tpos )
 			{
@@ -43,13 +43,16 @@ namespace TTreeProfiler
 				var order = ttreeOrders[ pos ];
 				string name = string.Format( "{0}-{1}", order[ 0 ], order[ 1 ] );
 
-				trees.Add( new Tree<string>( order[ 0 ], order[ 1 ] ) );
+				trees.Add( new TreeNode<string>( order[ 0 ], order[ 1 ] ) );
 				profiler.Add( "add", "T-Tree(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Insert( s ), values.Count, i ) );
 				profiler.Add( "search", "T-Tree(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Search( s ), trees[ pos ].Count - 1, i ) );
+
+				profiler.Add( "add", "T-Tree2(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Root.Insert( s ), values.Count, i ) );
+				profiler.Add( "search", "T-Tree2(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Root.Search( s ), trees[ pos ].Count - 1, i ) );
 			}
 
 
-			var list = new List<string>();
+			/*var list = new List<string>();
 			profiler.Add( "add", "List<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => list.Add( s ), values.Count, i ) );
 			profiler.Add( "search", "List<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => list.IndexOf( s ), list.Count - 1, i ) );
 
@@ -80,7 +83,7 @@ namespace TTreeProfiler
 			var redBlackTree = new RedBlackTree<string, string>();
 			profiler.Add( "add", "RedBlackTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => redBlackTree.Add( s, s ), values.Count, i ) );
 			profiler.Add( "search", "RedBlackTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => { string x = redBlackTree[ s ]; }, redBlackTree.Count - 1, i ) );
-			
+			*/
 			profiler.Profile();
 			Console.WriteLine();
 			Console.WriteLine( "----" );

@@ -12,7 +12,7 @@ namespace TTree
 	/// Google "A Study of Index Structures for Main Memory Database Management Systems"
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class TreeNode<T> //visitor, IEnumerable etc
+	public class TreeNode<T> : ITreeNode<T> //visitor, IEnumerable etc
 		where T : IComparable
 	{
 		protected readonly T[] m_data;
@@ -178,7 +178,6 @@ namespace TTree
 		private bool InsertInCurrentNode( T item, bool fullShiftToLeft )
 		{
 			Debug.Assert( fullShiftToLeft ? (Count == m_data.Length) : (Count < m_data.Length), "If doing a shift left, the node should have been full, otherwise it should not be called if the node is full" );
-
 
 			//TODO profile and see if there is any advantage to checking the min and max values here and setting closest=0 or closest=Count. Remember to check that the item was not already added
 
@@ -602,10 +601,6 @@ namespace TTree
 			}
 		}
 
-		/// <summary>
-		/// Gets the height.
-		/// </summary>
-		/// <value>The height.</value>
 		public int Height { get { return m_height; } }
 		public int Count { get; protected set; }
 		public int MaxItems { get { return m_data.Length; } }
