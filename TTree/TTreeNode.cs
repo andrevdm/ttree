@@ -46,8 +46,20 @@ namespace TTree
 		/// <returns>True if the item was added or false if it already existed and was not </returns>
 		public bool Insert( T item )
 		{
+			bool isBoundingNode;
+			int comparedToFirst = 0;
+
 			//Is this the bounding node for the new item? If the node is empty it is considered to be the bounding node.
-			bool isBoundingNode = (Count == 0) || ((item.CompareTo( m_data[ 0 ] ) >= 0) && (item.CompareTo( m_data[ Count - 1 ] ) <= 0));
+			if( Count == 0 )
+			{
+				isBoundingNode = true;
+			}
+			else
+			{
+				//Compare the item to be inserted to the first item in the data
+				comparedToFirst = item.CompareTo( m_data[ 0 ] );
+				isBoundingNode = ((comparedToFirst >= 0) && (item.CompareTo( m_data[ Count - 1 ] ) <= 0));
+			}
 
 			if( isBoundingNode )
 			{
@@ -84,13 +96,13 @@ namespace TTree
 			else
 			{
 				//If the item is less than the minimum and there is a left node, follow it
-				if( (Left != null) && (item.CompareTo( m_data[ 0 ] ) < 0) )
+				if( (Left != null) && (comparedToFirst < 0) )
 				{
 					return Left.Insert( item );
 				}
 
 				//If the item is less than the maximum and there is a right node, follow it
-				if( (Right != null) && (item.CompareTo( m_data[ 0 ] ) > 0) )
+				if( (Right != null) && (comparedToFirst > 0) )
 				{
 					return Right.Insert( item );
 				}
@@ -106,7 +118,7 @@ namespace TTree
 					// must be the new minimum or maximum (otherwise it would have found a bounding
 					// node) dont call InsertInCurrentNode which would do a binary search to find
 					// an insert location. Rather check for min/max and add it here.
-					if( item.CompareTo( m_data[ 0 ] ) > 0 )
+					if( comparedToFirst > 0 )
 					{
 						//The item is greater than the minimum, therfore it must be the new maximum.
 						// Add it to the end of the array
@@ -126,7 +138,7 @@ namespace TTree
 					TTreeNode<T> newChild = CreateChild( item );
 
 					//Add it as the the left or the right child
-					if( item.CompareTo( m_data[ 0 ] ) < 0 )
+					if( comparedToFirst < 0 )
 					{
 						Left = newChild;
 					}
