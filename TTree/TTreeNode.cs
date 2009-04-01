@@ -12,14 +12,15 @@ namespace TTree
 	/// Google "A Study of Index Structures for Main Memory Database Management Systems"
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class TreeNode<T> : ITreeNode<T> //visitor, IEnumerable etc
+	public class TTreeNode<T> : ITreeNode<T> //visitor, IEnumerable etc
 		where T : IComparable
 	{
 		protected readonly T[] m_data;
 		protected readonly int m_minimum;
 		protected int m_height = 0;
+		protected readonly TTreeRoot<T> m_root;
 
-		public TreeNode( int minimum, int maximum )
+		public TTreeNode( int minimum, int maximum, TTreeRoot<T> root )
 		{
 			#region param checks
 			if( minimum < 1 )
@@ -27,11 +28,15 @@ namespace TTree
 
 			if( maximum < minimum )
 				throw new ArgumentOutOfRangeException( "maximum", "Maximum value must be greater than the minimum. " );
+
+			if( root == null )
+				throw new ArgumentNullException( "root" );
 			#endregion
 
-			m_data = new T[ maximum ];
 			Count = 0;
+			m_data = new T[ maximum ];
 			m_minimum = minimum;
+			m_root = root;
 		}
 
 		/// <summary>
@@ -145,7 +150,7 @@ namespace TTree
 				}
 				else
 				{
-					TreeNode<T> newChild = CreateChild( item );
+					TTreeNode<T> newChild = CreateChild( item );
 
 					//Add it as the the left or the right child
 					if( item.CompareTo( m_data[ 0 ] ) < 0 )
@@ -306,8 +311,8 @@ namespace TTree
 
 		private void RotateRR()
 		{
-			TreeNode<T> b = Right;
-			TreeNode<T> c = b.Left;
+			TTreeNode<T> b = Right;
+			TTreeNode<T> c = b.Left;
 
 			if( Parent != null )
 			{
@@ -327,13 +332,18 @@ namespace TTree
 				c.Parent = this;
 			}
 
+			if( b.Parent == null )
+			{
+				Root.RootNode = b;
+			}
+
 			UpdateHeight();
 		}
 
 		private void RotateLL()
 		{
-			TreeNode<T> left = Left;
-			TreeNode<T> leftsRight = left.Right;
+			TTreeNode<T> left = Left;
+			TTreeNode<T> leftsRight = left.Right;
 
 			if( Parent != null )
 			{
@@ -351,6 +361,11 @@ namespace TTree
 			if( leftsRight != null )
 			{
 				leftsRight.Parent = this;
+			}
+
+			if( left.Parent == null )
+			{
+				Root.RootNode = left;
 			}
 
 			UpdateHeight();
@@ -515,10 +530,10 @@ namespace TTree
 		/// </summary>
 		/// <param name="item">The item.</param>
 		/// <returns></returns>
-		private TreeNode<T> CreateChild( T item )
+		private TTreeNode<T> CreateChild( T item )
 		{
 			//Create a new child node
-			TreeNode<T> newChild = new TreeNode<T>( m_minimum, m_data.Length );
+			TTreeNode<T> newChild = new TTreeNode<T>( m_minimum, m_data.Length, Root );
 			newChild.m_data[ 0 ] = item;
 			newChild.Count = 1;
 			newChild.Parent = this;
@@ -604,10 +619,10 @@ namespace TTree
 		public int Height { get { return m_height; } }
 		public int Count { get; protected set; }
 		public int MaxItems { get { return m_data.Length; } }
-		public TreeNode<T> Left { get; set; }
-		public TreeNode<T> Right { get; set; }
-		public TreeNode<T> Parent { get; set; }
-		public TreeNode<T> Root { get { return Parent == null ? this : Parent.Root; } }
+		public TTreeNode<T> Left { get; set; }
+		public TTreeNode<T> Right { get; set; }
+		public TTreeNode<T> Parent { get; set; }
+		public TTreeRoot<T> Root { get { return m_root; } }
 		public bool IsLeaf { get { return (Left == null) && (Right == null); } }
 		public bool IsHalfLeaf { get { return !IsLeaf && ((Left == null) || (Right == null)); } }
 		public T this[ int index ] { get { return m_data[ index ]; } }

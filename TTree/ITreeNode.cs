@@ -39,10 +39,10 @@ namespace TTree
 		bool IsLeaf { get; }
 		bool IsHalfLeaf { get; }
 		int MaxItems { get; }
-		TreeNode<T> Root { get; }
-		TreeNode<T> Left { get; set; }
-		TreeNode<T> Right { get; set; }
-		TreeNode<T> Parent { get; set; }
+		TTreeRoot<T> Root { get; }
+		TTreeNode<T> Left { get; set; }
+		TTreeNode<T> Right { get; set; }
+		TTreeNode<T> Parent { get; set; }
 		T this[ int index ] { get; }
 		int BalanceFactor { get; }
 	}

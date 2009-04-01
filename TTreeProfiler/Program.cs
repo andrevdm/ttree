@@ -24,7 +24,7 @@ namespace TTreeProfiler
 			Console.WriteLine( "Values created, profiling" );
 
 			//int seconds = 1;
-			int seconds = 2;
+			int seconds = 10;
 
 			var profiler = new Profiler();
 
@@ -35,7 +35,7 @@ namespace TTreeProfiler
 			profiler.AddCombine( "search", 75 );
 
 			int[][] ttreeOrders = new int[][] { new[] { 40, 43 }, new[] { 97, 100 }, new[] { 17, 20 }, new[] { 7, 10 }, new[] { 497, 500 }, new[] { 2000, 2003 }, };
-			List<TreeNode<string>> trees = new List<TreeNode<string>>();
+			List<TTreeRoot<string>> trees = new List<TTreeRoot<string>>();
 
 			for( int tpos = 0; tpos < ttreeOrders.Length; ++tpos )
 			{
@@ -43,7 +43,7 @@ namespace TTreeProfiler
 				var order = ttreeOrders[ pos ];
 				string name = string.Format( "{0}-{1}", order[ 0 ], order[ 1 ] );
 
-				trees.Add( new TreeNode<string>( order[ 0 ], order[ 1 ] ) );
+				trees.Add( new TTreeRoot<string>( order[ 0 ], order[ 1 ] ) );
 				profiler.Add( "add", "T-Tree(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Insert( s ), values.Count, i ) );
 				profiler.Add( "search", "T-Tree(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Search( s ), trees[ pos ].Count - 1, i ) );
 
@@ -52,7 +52,7 @@ namespace TTreeProfiler
 			}
 
 
-			/*var list = new List<string>();
+			var list = new List<string>();
 			profiler.Add( "add", "List<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => list.Add( s ), values.Count, i ) );
 			profiler.Add( "search", "List<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => list.IndexOf( s ), list.Count - 1, i ) );
 
@@ -83,7 +83,7 @@ namespace TTreeProfiler
 			var redBlackTree = new RedBlackTree<string, string>();
 			profiler.Add( "add", "RedBlackTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => redBlackTree.Add( s, s ), values.Count, i ) );
 			profiler.Add( "search", "RedBlackTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => { string x = redBlackTree[ s ]; }, redBlackTree.Count - 1, i ) );
-			*/
+			
 			profiler.Profile();
 			Console.WriteLine();
 			Console.WriteLine( "----" );

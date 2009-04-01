@@ -8,7 +8,12 @@ namespace TTree
 	public class TTreeRoot<T> : ITreeNode<T>
 		where T : IComparable
 	{
-		public TreeNode<T> RootNode { get; private set; }
+		public TTreeRoot( int minimum, int maximum )
+		{
+			RootNode = new TTreeNode<T>( minimum, maximum, this );
+		}
+
+		public TTreeNode<T> RootNode { get; protected internal set; }
 
 		#region ITreeNode delegating to actual root node
 		public bool Insert( T item )
@@ -71,24 +76,24 @@ namespace TTree
 			get { return RootNode.MaxItems; }
 		}
 
-		public TreeNode<T> Root
+		public TTreeRoot<T> Root
 		{
 			get { return RootNode.Root; }
 		}
 
-		public TreeNode<T> Left
+		public TTreeNode<T> Left
 		{
 			get{return RootNode.Left; }
 			set { RootNode.Left = value; }
 		}
 
-		public TreeNode<T> Right
+		public TTreeNode<T> Right
 		{
 			get { return RootNode.Right; }
 			set { RootNode.Right = value; }
 		}
 
-		public TreeNode<T> Parent
+		public TTreeNode<T> Parent
 		{
 			get { return RootNode.Parent; }
 			set { RootNode.Parent = value; }
