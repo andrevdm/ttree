@@ -18,13 +18,51 @@ namespace TTreeProfiler
 	{
 		static void Main( string[] args )
 		{
+			Console.WriteLine( "Type of profile" );
+			Console.WriteLine( " 1 - Compare collection performance");
+			Console.WriteLine( " 2 - Insert loop for external profiler" );
+
+			char c = Console.ReadKey( true ).KeyChar;
+
+			switch( c )
+			{
+				case '1': CompareCollectionPerformance();
+					break;
+
+				case '2': InsertLoop();
+					break;
+
+				default:
+					Console.WriteLine( "Unknown option: " + c );
+					break;
+			}
+		}
+
+		private static void InsertLoop()
+		{
+			Console.WriteLine( "Number of iteration? " );
+			int max = int.Parse( Console.ReadLine() );
+
+			Console.WriteLine( "Tree min order (max = min + 3)?" );
+			int orderMin = int.Parse( Console.ReadLine() );
+
+			TTreeRoot<string> root = new TTreeRoot<string>( orderMin, orderMin + 3 );
+
+			for( int i = 0; i < max; ++i )
+			{
+				root.Insert( Guid.NewGuid().ToString() );
+			}
+		}
+
+		private static void CompareCollectionPerformance()
+		{
+			Console.WriteLine( "Run each test for seconds?" );
+			int seconds = int.Parse( Console.ReadLine() );
+
 			int max = 10000000;
 			List<Guid> values = Gen( max );
 			Console.WriteLine();
 			Console.WriteLine( "Values created, profiling" );
-
-			//int seconds = 1;
-			int seconds = 10;
 
 			var profiler = new Profiler();
 
