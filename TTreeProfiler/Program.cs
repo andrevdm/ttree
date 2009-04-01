@@ -84,9 +84,6 @@ namespace TTreeProfiler
 				trees.Add( new TTreeRoot<string>( order[ 0 ], order[ 1 ] ) );
 				profiler.Add( "add", "T-Tree(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Insert( s ), values.Count, i ) );
 				profiler.Add( "search", "T-Tree(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Search( s ), trees[ pos ].Count - 1, i ) );
-
-				profiler.Add( "add", "T-Tree2(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Root.Insert( s ), values.Count, i ) );
-				profiler.Add( "search", "T-Tree2(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Root.Search( s ), trees[ pos ].Count - 1, i ) );
 			}
 
 
