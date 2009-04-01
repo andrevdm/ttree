@@ -80,7 +80,6 @@ namespace TTree
 						if( Left.Insert( oldMinimum ) )
 						{
 							UpdateHeight();
-							Rebalance( true );
 							return true;
 						}
 						else
@@ -98,7 +97,6 @@ namespace TTree
 					if( Left.Insert( item ) )
 					{
 						UpdateHeight();
-						Rebalance( true );
 						return true;
 					}
 					else
@@ -220,7 +218,6 @@ namespace TTree
 				m_data[ closest - 1 ] = item;
 			}
 
-			Rebalance( true );
 			return true;
 		}
 
