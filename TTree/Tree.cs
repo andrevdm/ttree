@@ -369,7 +369,7 @@ namespace TTree
 		/// <param name="item">The item.</param>
 		/// <param name="comparer">The comparer.</param>
 		/// <returns></returns>
-		public T Search<TSearch>( TSearch item, Func<TSearch,T,int> comparer )
+		public T Search<TSearch>( TSearch item, Func<TSearch, T, int> comparer )
 		{
 			if( Count == 0 )
 				return default( T );
@@ -615,5 +615,6 @@ namespace TTree
 		public Tree<T> Root { get { return Parent == null ? this : Parent.Root; } }
 		public bool IsLeaf { get { return (Left == null) && (Right == null); } }
 		public bool IsHalfLeaf { get { return !IsLeaf && ((Left == null) || (Right == null)); } }
+		public T this[ int index ] { get { return m_data[ index ]; } }
 	}
 }
