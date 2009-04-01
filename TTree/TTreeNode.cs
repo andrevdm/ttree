@@ -77,15 +77,7 @@ namespace TTree
 					else
 					{
 						//Add the old minimum to the left child
-						if( Left.Insert( oldMinimum ) )
-						{
-							UpdateHeight();
-							return true;
-						}
-						else
-						{
-							return false;
-						}
+						return Left.Insert( oldMinimum );
 					}
 				}
 			}
@@ -94,30 +86,13 @@ namespace TTree
 				//If the item is less than the minimum and there is a left node, follow it
 				if( (Left != null) && (item.CompareTo( m_data[ 0 ] ) < 0) )
 				{
-					if( Left.Insert( item ) )
-					{
-						UpdateHeight();
-						return true;
-					}
-					else
-					{
-						return false;
-					}
+					return Left.Insert( item );
 				}
 
 				//If the item is less than the maximum and there is a right node, follow it
 				if( (Right != null) && (item.CompareTo( m_data[ 0 ] ) > 0) )
 				{
-					if( Right.Insert( item ) )
-					{
-						UpdateHeight();
-						Rebalance( true );
-						return true;
-					}
-					else
-					{
-						return false;
-					}
+					return Right.Insert( item );
 				}
 
 
