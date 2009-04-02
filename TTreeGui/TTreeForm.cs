@@ -31,16 +31,29 @@ namespace TTreeGui
 
 		private void m_addButton_Click( object sender, EventArgs e )
 		{
-			m_root.Insert( int.Parse( m_valueTextBox.Text ) );
+			AddValue();
+		}
+
+		private void m_valueTextBox_KeyDown( object sender, KeyEventArgs e )
+		{
+			if( e.KeyCode == Keys.Enter )
+			{
+				AddValue();
+			}
+		}
+
+		private void m_deleteButton_Click( object sender, EventArgs e )
+		{
+			m_root.Delete( int.Parse( m_valueTextBox.Text ) );
 			Redraw();
 
 			ActiveControl = m_valueTextBox;
 			m_valueTextBox.SelectAll();
 		}
 
-		private void m_deleteButton_Click( object sender, EventArgs e )
+		private void AddValue()
 		{
-			m_root.Delete( int.Parse( m_valueTextBox.Text ) );
+			m_root.Insert( int.Parse( m_valueTextBox.Text ) );
 			Redraw();
 
 			ActiveControl = m_valueTextBox;
