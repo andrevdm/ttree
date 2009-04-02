@@ -53,7 +53,18 @@ namespace TTreeGui
 
 		private void AddValue()
 		{
-			m_root.Insert( int.Parse( m_valueTextBox.Text ) );
+			if( !m_valueTextBox.Text.Contains( "," ) )
+			{
+				m_root.Insert( int.Parse( m_valueTextBox.Text ) );
+			}
+			else
+			{
+				foreach( var s in m_valueTextBox.Text.Split( new[] { ',' } ) )
+				{
+					m_root.Insert( int.Parse( s ) );
+				}
+			}
+
 			Redraw();
 
 			ActiveControl = m_valueTextBox;

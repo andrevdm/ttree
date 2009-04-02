@@ -69,7 +69,7 @@
 			// 
 			// m_deleteButton
 			// 
-			this.m_deleteButton.Location = new System.Drawing.Point( 202, 9 );
+			this.m_deleteButton.Location = new System.Drawing.Point( 330, 9 );
 			this.m_deleteButton.Name = "m_deleteButton";
 			this.m_deleteButton.Size = new System.Drawing.Size( 75, 23 );
 			this.m_deleteButton.TabIndex = 2;
@@ -79,7 +79,7 @@
 			// 
 			// m_addButton
 			// 
-			this.m_addButton.Location = new System.Drawing.Point( 120, 9 );
+			this.m_addButton.Location = new System.Drawing.Point( 248, 9 );
 			this.m_addButton.Name = "m_addButton";
 			this.m_addButton.Size = new System.Drawing.Size( 75, 23 );
 			this.m_addButton.TabIndex = 1;
@@ -91,7 +91,7 @@
 			// 
 			this.m_valueTextBox.Location = new System.Drawing.Point( 13, 13 );
 			this.m_valueTextBox.Name = "m_valueTextBox";
-			this.m_valueTextBox.Size = new System.Drawing.Size( 100, 20 );
+			this.m_valueTextBox.Size = new System.Drawing.Size( 229, 20 );
 			this.m_valueTextBox.TabIndex = 0;
 			this.m_valueTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler( this.m_valueTextBox_KeyDown );
 			// 
