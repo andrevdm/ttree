@@ -107,10 +107,7 @@ namespace TTree
 					return Right.Insert( item );
 				}
 
-
 				//If we are here then, there is no bounding node for this value.
-				Debug.Assert( IsLeaf || IsHalfLeaf, "Something is very wrong if this node is not a leaf or half-leaf." );
-
 				//Is there place in this node
 				if( Count < m_data.Length )
 				{
