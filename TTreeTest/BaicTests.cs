@@ -284,6 +284,30 @@ namespace TTreeTest
 			}
 		}
 
+		[TestMethod]
+		public void CheckHeightAfterMultiLevelInsert()
+		{
+			var tree = new TTreeRoot<int>( 2, 2 );
+
+			tree.Insert( 10 );
+			tree.Insert( 20 );
+			tree.Insert( 30 );
+			tree.Insert( 40 );
+			tree.Insert( 50 );
+			tree.Insert( 60 );
+			tree.Insert( 70 );
+			tree.Insert( 80 );
+			tree.Insert( 90 );
+
+			CheckTree<int>( tree.RootNode, 2, new[] { 30, 40 }, true, true, null, 30 );
+
+			CheckTree<int>( tree.RootNode.Left, 0, new[] { 10, 20 }, false, false, tree.RootNode, 30 );
+			CheckTree<int>( tree.RootNode.Right, 1, new[] { 70, 80 }, true, true, tree.RootNode, 30 );
+
+			CheckTree<int>( tree.RootNode.Right.Left, 0, new[] { 50, 60 }, false, false, tree.RootNode.Right, 30 );
+			CheckTree<int>( tree.RootNode.Right.Right, 0, new[] { 90 }, false, false, tree.RootNode.Right, 30 );
+		}
+
 
 		private void CheckTree<T>(
 			TTreeNode<T> tree,

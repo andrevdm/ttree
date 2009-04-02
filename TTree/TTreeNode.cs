@@ -82,7 +82,7 @@ namespace TTree
 					{
 						//There is no left child, so create it
 						Left = CreateChild( oldMinimum );
-						UpdateHeight();
+						UpdateHeight( false );
 						Rebalance( true );
 						return true;
 					}
@@ -144,7 +144,7 @@ namespace TTree
 						Right = newChild;
 					}
 
-					UpdateHeight();
+					UpdateHeight( true );
 					Rebalance( true );
 					return true;
 				}
@@ -318,7 +318,7 @@ namespace TTree
 				Root.RootNode = b;
 			}
 
-			UpdateHeight();
+			UpdateHeight( true );
 		}
 
 		private void RotateLL()
@@ -349,7 +349,7 @@ namespace TTree
 				Root.RootNode = left;
 			}
 
-			UpdateHeight();
+			UpdateHeight( true );
 		}
 
 		public void Delete( T item )
@@ -519,14 +519,12 @@ namespace TTree
 			newChild.Count = 1;
 			newChild.Parent = this;
 
-			newChild.UpdateHeight();
-
 			return newChild;
 		}
 
-		private void UpdateHeight()
+		private void UpdateHeight( bool updateAllUpwards )
 		{
-			int oldHeight = m_height;
+			//int oldHeight = m_height;
 
 			if( Count == 0 )
 			{
@@ -540,10 +538,9 @@ namespace TTree
 				m_height = 1 + Math.Max( lheight, rheight );
 			}
 
-			//If the height was changed, updated the parent nodes height too
-			if( (Parent != null) && (oldHeight != m_height) )
+			if( updateAllUpwards && (Parent != null) )
 			{
-				Parent.UpdateHeight();
+				Parent.UpdateHeight( updateAllUpwards );
 			}
 		}
 
@@ -606,6 +603,6 @@ namespace TTree
 		public TTreeRoot<T> Root { get { return m_root; } }
 		public bool IsLeaf { get { return (Left == null) && (Right == null); } }
 		public bool IsHalfLeaf { get { return !IsLeaf && ((Left == null) || (Right == null)); } }
-		public T this[ int index ] { get { return m_data[ index ]; } }
+		public T this[ int index ] { get { return m_data[ index ]; } } //TODO change to be Values[]
 	}
 }
