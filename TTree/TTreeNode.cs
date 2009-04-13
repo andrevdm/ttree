@@ -366,41 +366,47 @@ namespace TTree
 		/// <returns></returns>
 		public T Search<TSearch>( TSearch item, Func<TSearch, T, int> comparer )
 		{
+			var result = SearchFor( item, comparer );
+			return (result == null) ? default( T ) : result.Value;
+		}
+
+		public SearchResult<T> SearchFor<TSearch>( TSearch item, Func<TSearch, T, int> comparer )
+		{
 			if( Count == 0 )
-				return default( T );
+				return null;
 
 			int compare = comparer( item, m_data[ 0 ] );
 
 			if( compare == 0 )
-				return m_data[ 0 ];
+				return new SearchResult<T>( m_data[ 0 ], this, 0 );
 
 			if( compare < 0 )
 			{
 				if( Left != null )
-					return Left.Search( item, comparer );
+					return Left.SearchFor( item, comparer );
 				else
-					return default( T );
+					return null;
 			}
 
 			compare = comparer( item, m_data[ Count - 1 ] );
 
 			if( compare == 0 )
-				return m_data[ Count - 1 ];
+				return new SearchResult<T>( m_data[ Count - 1 ], this, Count - 1 );
 
 			if( compare > 0 )
 			{
 				if( Right != null )
-					return Right.Search( item, comparer );
+					return Right.SearchFor( item, comparer );
 				else
-					return default( T );
+					return null;
 			}
 
 			int closest = BinarySearch<TSearch>( m_data, 0, Count, item, comparer );
 
 			if( closest >= 0 )
-				return m_data[ closest ];
+				return new SearchResult<T>( m_data[ closest ], this, closest );
 
-			return default( T );
+			return null;
 		}
 
 		/// <summary>
@@ -410,43 +416,49 @@ namespace TTree
 		/// <returns></returns>
 		public T Search( T item )
 		{
+			var result = SearchFor( item );
+			return (result == null) ? default( T ) : result.Value;
+		}
+
+		public SearchResult<T> SearchFor( T item )
+		{
 			//This code is not shared with the other Search() method to keep things as fast as possible
 
 			if( Count == 0 )
-				return default( T );
+				return null;
 
 			int compare = item.CompareTo( m_data[ 0 ] );
 
 			if( compare == 0 )
-				return m_data[ 0 ];
+				return new SearchResult<T>( m_data[ 0 ], this, 0 );
 
 			if( compare < 0 )
 			{
 				if( Left != null )
-					return Left.Search( item );
+					return Left.SearchFor( item );
 				else
-					return default( T );
+					return null;
 			}
 
 			compare = item.CompareTo( m_data[ Count - 1 ] );
 
 			if( compare == 0 )
-				return m_data[ Count - 1 ];
+				return new SearchResult<T>( m_data[ Count - 1 ], this, Count - 1 );
 
 			if( compare > 0 )
 			{
 				if( Right != null )
-					return Right.Search( item );
+					return Right.SearchFor( item );
 				else
-					return default( T );
+					return null;
 			}
 
 			int closest = Array.BinarySearch<T>( m_data, 0, Count, item );
 
 			if( closest >= 0 )
-				return m_data[ closest ];
+				return new SearchResult<T>( m_data[ closest ], this, closest );
 
-			return default( T );
+			return null;
 		}
 
 		public void CopyItems( T[] destinationArray, int index )
