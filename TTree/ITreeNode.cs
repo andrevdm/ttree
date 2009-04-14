@@ -22,6 +22,9 @@ namespace TTree
 		/// <returns></returns>
 		T Search<TSearch>( TSearch item, Func<TSearch, T, int> comparer );
 
+		SearchResult<T> SearchFor<TSearch>( TSearch item, Func<TSearch, T, int> comparer );
+		SearchResult<T> SearchFor( T item );
+
 		/// <summary>
 		/// Searches for the specified item.
 		/// </summary>

@@ -31,6 +31,16 @@ namespace TTree
 			return RootNode.Search( item );
 		}
 
+		public SearchResult<T> SearchFor( T item )
+		{
+			return RootNode.SearchFor( item );
+		}
+
+		public SearchResult<T> SearchFor<TSearch>( TSearch item, Func<TSearch, T, int> comparer )
+		{
+			return RootNode.SearchFor( item, comparer );
+		}
+
 		public void CopyItems( T[] destinationArray, int index )
 		{
 			RootNode.CopyItems( destinationArray, index );
