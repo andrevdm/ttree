@@ -46,9 +46,9 @@ namespace TTree
 			RootNode.CopyItems( destinationArray, index );
 		}
 
-		public void Delete( T item )
+		public bool Delete( T item )
 		{
-			RootNode.Delete( item );
+			return RootNode.Delete( item );
 		}
 
 		public string ToDot( Func<T, string> toString )
@@ -79,6 +79,11 @@ namespace TTree
 		public bool IsHalfLeaf
 		{
 			get { return RootNode.IsHalfLeaf; }
+		}
+
+		public bool IsInternal
+		{
+			get { return RootNode.IsInternal; }
 		}
 
 		public int MaxItems

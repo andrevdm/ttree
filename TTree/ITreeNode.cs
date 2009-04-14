@@ -33,7 +33,7 @@ namespace TTree
 		T Search( T item );
 
 		void CopyItems( T[] destinationArray, int index );
-		void Delete( T item );
+		bool Delete( T item );
 		string ToDot( Func<T, string> toString );
 		string ToDot();
 
@@ -41,6 +41,7 @@ namespace TTree
 		int Height { get; }
 		bool IsLeaf { get; }
 		bool IsHalfLeaf { get; }
+		bool IsInternal { get; }
 		int MaxItems { get; }
 		TTreeRoot<T> Root { get; }
 		TTreeNode<T> Left { get; set; }

@@ -352,9 +352,69 @@ namespace TTree
 			UpdateHeight( true );
 		}
 
-		public void Delete( T item )
+		public bool Delete( T item )
 		{
-			throw new NotImplementedException();
+			SearchResult<T> searchResult = SearchFor( item );
+
+			if( searchResult == null )
+			{
+				return false;
+			}
+
+			//If the delete will not cause an underflow then, delete the value and stop
+			if( searchResult.Node.Count > searchResult.Node.m_minimum )
+			{
+				DeleteFoundValue( searchResult );
+				return true;
+			}
+
+			if( IsInternal )
+			{
+				DeleteFoundValue( searchResult );
+				//TODO borrow the greatest lower bound of this node from a leaf or half-leaf to bring this node’s element count back up to the minimum. 
+			}
+			else  //This is a leaf or half-leaf so just delete the value (leaves and half-leaves are permitted to underflow)
+			{
+				DeleteFoundValue( searchResult );
+
+				//If this is a half leaf and it can be merged with a leaf, then combine
+				if( IsHalfLeaf )
+				{
+					//TODO check if can merge
+				}
+				else //Is leaf
+				{
+					if( searchResult.Node.Count != 0 )
+					{
+						//This is a non-empty leaf. Nothing more to do
+						return true;
+					}
+					else
+					{
+						//The node is empty. So, unles this is the root, remove the node from its parent.
+						if( searchResult.Node.Parent != null )
+						{
+							if( searchResult.Node.Parent.Left == searchResult.Node )
+							{
+								searchResult.Node.Parent.Left = null;
+							}
+							else
+							{
+								searchResult.Node.Parent.Right = null;
+							}
+						}
+					}
+				}
+			}
+
+			Rebalance( false ); //TODO , true ); - Stop after node of even balance found
+			return true;
+		}
+
+		private void DeleteFoundValue( SearchResult<T> searchResult )
+		{
+			Array.Copy( searchResult.Node.m_data, searchResult.Index + 1, searchResult.Node.m_data, searchResult.Index, searchResult.Node.m_data.Length - 1 - searchResult.Index );
+			searchResult.Node.Count--;
 		}
 
 		/// <summary>
@@ -615,6 +675,7 @@ namespace TTree
 		public TTreeRoot<T> Root { get { return m_root; } }
 		public bool IsLeaf { get { return (Left == null) && (Right == null); } }
 		public bool IsHalfLeaf { get { return !IsLeaf && ((Left == null) || (Right == null)); } }
+		public bool IsInternal { get { return (Left != null) && (Right != null); } } 
 		public T this[ int index ] { get { return m_data[ index ]; } } //TODO change to be Values[]
 	}
 }

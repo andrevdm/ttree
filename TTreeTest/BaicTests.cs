@@ -308,6 +308,59 @@ namespace TTreeTest
 			CheckTree<int>( tree.RootNode.Right.Right, 0, new[] { 90 }, false, false, tree.RootNode.Right, 30 );
 		}
 
+		[TestMethod]
+		public void Delete_From_NodeNoUnderflow_RemovesItem()
+		{
+			var tree = new TTreeRoot<int>( 2, 3 );
+
+			tree.Insert( 10 );
+			tree.Insert( 11 );
+			tree.Insert( 12 );
+			tree.Insert( 4 );
+			tree.Insert( 5 );
+
+			tree.Delete( 11 );
+
+			CheckTree<int>( tree.RootNode, 1, new[] { 10, 12 }, true, false, null, 10 );
+			CheckTree<int>( tree.RootNode.Left, 0, new[] { 4, 5 }, false, false, tree.RootNode, 10 );
+		}
+
+		[TestMethod]
+		public void Delete_From_Leaf_RemovesItem()
+		{
+			var tree = new TTreeRoot<int>( 3, 3 );
+
+			tree.Insert( 10 );
+			tree.Insert( 5 );
+			tree.Insert( 15 );
+			
+			tree.Delete( 10 );
+			
+			CheckTree<int>( tree.RootNode, 0, new[] { 5, 15 }, false, false, null, 5 );
+		}
+
+		[TestMethod]
+		public void Delete_From_HalfLeaf_RemovesItem()
+		{
+			var tree = new TTreeRoot<int>( 3, 3 );
+
+			tree.Insert( 10 );
+			tree.Insert( 11 );
+			tree.Insert( 12 );
+			tree.Insert( 4 );
+			tree.Insert( 5 );
+
+			tree.Delete( 12 );
+
+			CheckTree<int>( tree.RootNode, 1, new[] { 10, 11 }, true, false, null, 10 );
+			CheckTree<int>( tree.RootNode.Left, 0, new[] { 4, 5 }, false, false, null, 10 );
+		}
+
+		[TestMethod]
+		public void Delete_From_InternalNode_BorrowTheGreatestLowerBound()
+		{
+			Assert.Fail();
+		}
 
 		private void CheckTree<T>(
 			TTreeNode<T> tree,
