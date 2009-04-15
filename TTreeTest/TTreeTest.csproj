@@ -38,8 +38,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BasicTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BaicTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TTree\TTree.csproj">

@@ -10,7 +10,7 @@ using System.Collections;
 namespace TTreeTest
 {
 	[TestClass]
-	public class BaicTests
+	public class BasicTests
 	{
 		[TestMethod]
 		public void InsertIntoRootWithSpace()
