@@ -222,6 +222,7 @@
 			this.MinimumSize = new System.Drawing.Size( 300, 300 );
 			this.Name = "TTreeForm";
 			this.Text = "TTreeForm";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler( this.TTreeForm_FormClosing );
 			this.panel1.ResumeLayout( false );
 			this.panel1.PerformLayout();
 			this.panel2.ResumeLayout( false );

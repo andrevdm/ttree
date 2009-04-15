@@ -24,9 +24,27 @@ namespace TTreeGui
 		{
 			InitializeComponent();
 
+			DeleteOldFiles();
+
 			m_dotPath = dotPath;
 			m_root = new TTreeRoot<int>( min, max );
+			m_oldDot = m_root.ToDot();
 			Redraw();
+		}
+
+		private void DeleteOldFiles()
+		{
+			DeleteOldFile( "old" );
+			DeleteOldFile( "new" );
+		}
+		
+		private void DeleteOldFile( string prefix )
+		{
+			string path = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location );
+			string pngFile = Path.Combine( path, prefix + ".png" );
+
+			if( File.Exists( pngFile ) )
+				File.Delete( pngFile );
 		}
 
 		private void m_addButton_Click( object sender, EventArgs e )
@@ -112,6 +130,15 @@ namespace TTreeGui
 			pbox.Image = Image.FromFile( pngFile );
 			pbox.Width = pbox.Image.Width;
 			pbox.Height = pbox.Image.Height;
+		}
+
+		private void TTreeForm_FormClosing( object sender, FormClosingEventArgs e )
+		{
+			if( m_newPic.Image != null )
+				m_newPic.Image.Dispose();
+
+			if( m_oldPic.Image != null )
+				m_oldPic.Image.Dispose();
 		}
 	}
 }
