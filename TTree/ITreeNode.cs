@@ -2,7 +2,11 @@
 
 namespace TTree
 {
-	public interface ITreeNode<T> 
+	/// <summary>
+	/// Implemented by TTreeNodes and the TTreeRoot
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	public interface ITTreeNode<T> 
 		where T : IComparable
 	{
 
@@ -22,7 +26,20 @@ namespace TTree
 		/// <returns></returns>
 		T Search<TSearch>( TSearch item, Func<TSearch, T, int> comparer );
 
+		/// <summary>
+		/// Search for an item using a custom comparison function
+		/// </summary>
+		/// <typeparam name="TSearch">The type of the search.</typeparam>
+		/// <param name="item">The item.</param>
+		/// <param name="comparer">The comparer.</param>
+		/// <returns></returns>
 		SearchResult<T> SearchFor<TSearch>( TSearch item, Func<TSearch, T, int> comparer );
+		
+		/// <summary>
+		/// Searches for the specified item.
+		/// </summary>
+		/// <param name="item">The item.</param>
+		/// <returns></returns>
 		SearchResult<T> SearchFor( T item );
 
 		/// <summary>

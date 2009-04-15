@@ -12,7 +12,7 @@ namespace TTree
 	/// Google "A Study of Index Structures for Main Memory Database Management Systems"
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class TTreeNode<T> : ITreeNode<T> //visitor, IEnumerable etc
+	public class TTreeNode<T> : ITTreeNode<T> //visitor, IEnumerable etc
 		where T : IComparable
 	{
 		protected readonly T[] m_data;

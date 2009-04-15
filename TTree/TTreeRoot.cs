@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TTree
 {
-	public class TTreeRoot<T> : ITreeNode<T>
+	public class TTreeRoot<T> : ITTreeNode<T>
 		where T : IComparable
 	{
 		public TTreeRoot( int minimum, int maximum )
