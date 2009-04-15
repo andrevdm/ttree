@@ -340,6 +340,21 @@ namespace TTreeTest
 		}
 
 		[TestMethod]
+		public void Delete_From_HalfLeaf_Merges()
+		{
+			var tree = new TTreeRoot<int>( 3, 3 );
+
+			tree.Insert( 10 );
+			tree.Insert( 11 );
+			tree.Insert( 12 );
+			tree.Insert( 5 );
+
+			tree.Delete( 12 );
+
+			CheckTree<int>( tree.RootNode, 0, new[] { 5, 10, 11 }, false, false, null, 5 );
+		}
+
+		[TestMethod]
 		public void Delete_From_HalfLeaf_RemovesItem()
 		{
 			var tree = new TTreeRoot<int>( 3, 3 );
@@ -353,7 +368,7 @@ namespace TTreeTest
 			tree.Delete( 12 );
 
 			CheckTree<int>( tree.RootNode, 1, new[] { 10, 11 }, true, false, null, 10 );
-			CheckTree<int>( tree.RootNode.Left, 0, new[] { 4, 5 }, false, false, null, 10 );
+			CheckTree<int>( tree.RootNode.Left, 0, new[] { 4, 5 }, false, false, tree.RootNode, 10 );
 		}
 
 		[TestMethod]

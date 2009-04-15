@@ -380,7 +380,20 @@ namespace TTree
 				//If this is a half leaf and it can be merged with a leaf, then combine
 				if( IsHalfLeaf )
 				{
-					//TODO check if can merge
+					var child = (Left == null) ? Right : Left;
+
+					//If all the child items can fit into this node
+					if( Count + child.Count <= MaxItems )
+					{
+						for( int i = 0; i < child.Count; ++i )
+						{
+							InsertInCurrentNode( child.m_data[ i ], false );
+						}
+
+						//Remove the child
+						Left = Right = null;
+						m_height = 0;
+					}
 				}
 				else //Is leaf
 				{
