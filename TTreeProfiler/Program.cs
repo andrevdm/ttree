@@ -5,8 +5,6 @@ using System.Text;
 using System.Diagnostics;
 using System.Collections;
 
-using NGenerics.DataStructures.Trees;
-
 using TTree;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -111,14 +109,6 @@ namespace TTreeProfiler
 			profiler.Add( "add", "array[]", i => Time( values, seconds, i.Desc + " - " + i.Group, s => array[ i.Count ] = s, values.Count, i ) );
 			profiler.Add( "search", "array[]", i => Time( values, seconds, i.Desc + " - " + i.Group, s => { var x = (from a in array where a == s select a).First(); }, array.Length - 1, i ) );
 
-			var binTree = new BinarySearchTree<string, string>();
-			profiler.Add( "add", "BinarySearchTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => binTree.Add( s, s ), values.Count, i ) );
-			profiler.Add( "search", "BinarySearchTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => { string x = binTree[ s ]; }, binTree.Count - 1, i ) );
-
-			var redBlackTree = new RedBlackTree<string, string>();
-			profiler.Add( "add", "RedBlackTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => redBlackTree.Add( s, s ), values.Count, i ) );
-			profiler.Add( "search", "RedBlackTree", i => Time( values, seconds, i.Desc + " - " + i.Group, s => { string x = redBlackTree[ s ]; }, redBlackTree.Count - 1, i ) );
-			
 			profiler.Profile();
 			Console.WriteLine();
 			Console.WriteLine( "----" );
