@@ -83,7 +83,7 @@ namespace TTree
 						//There is no left child, so create it
 						Left = CreateChild( oldMinimum );
 						UpdateHeight( false );
-						Rebalance( true );
+						Rebalance( true, false );
 						return true;
 					}
 					else
@@ -145,7 +145,7 @@ namespace TTree
 					}
 
 					UpdateHeight( true );
-					Rebalance( true );
+					Rebalance( true, false );
 					return true;
 				}
 			}
@@ -205,7 +205,7 @@ namespace TTree
 			return true;
 		}
 
-		private void Rebalance( bool stopAfterFirstRotate )
+		private void Rebalance( bool stopAfterFirstRotate, bool stopAfterEvenBalanceFound )
 		{
 			if( BalanceFactor > 1 )
 			{
@@ -241,10 +241,15 @@ namespace TTree
 						return;
 				}
 			}
+			else
+			{
+				if( stopAfterEvenBalanceFound )
+					return;
+			}
 
 			if( Parent != null )
 			{
-				Parent.Rebalance( true );
+				Parent.Rebalance( true, false );
 			}
 		}
 
@@ -420,7 +425,7 @@ namespace TTree
 				}
 			}
 
-			Rebalance( false ); //TODO , true ); - Stop after node of even balance found
+			Rebalance( false, true );
 			return true;
 		}
 
