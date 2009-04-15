@@ -373,31 +373,40 @@ namespace TTree
 				return true;
 			}
 
-			if( IsInternal )
+			if( searchResult.Node.IsInternal )
 			{
-				DeleteFoundValue( searchResult );
-				//TODO borrow the greatest lower bound of this node from a leaf or half-leaf to bring this node’s element count back up to the minimum. 
+				//Shift the array to the right "delete"
+				// This is faster than calling DeleteFoundValue() because now there is no need to shift
+				// the array a second time to make space for the greatest lower bound
+				if( searchResult.Index > 0 )
+				{
+					Array.Copy( searchResult.Node.m_data, searchResult.Index - 1, searchResult.Node.m_data, searchResult.Index, searchResult.Node.m_data.Length - 1 - searchResult.Index );
+				}
+
+				//Insert the greatest lower bound
+				m_data[ 0 ] = searchResult.Node.Left.CutGreatestLowerBound();
 			}
 			else  //This is a leaf or half-leaf so just delete the value (leaves and half-leaves are permitted to underflow)
 			{
 				DeleteFoundValue( searchResult );
 
 				//If this is a half leaf and it can be merged with a leaf, then combine
-				if( IsHalfLeaf )
+				if( searchResult.Node.IsHalfLeaf )
 				{
-					var child = (Left == null) ? Right : Left;
+					var child = (searchResult.Node.Left == null) ? searchResult.Node.Right : searchResult.Node.Left;
 
 					//If all the child items can fit into this node
-					if( Count + child.Count <= MaxItems )
+					if( searchResult.Node.Count + child.Count <= MaxItems )
 					{
+						//TODO consider not looping - the child is sorted, insert all the items at once, either at the begining or at the end (left/right)
 						for( int i = 0; i < child.Count; ++i )
 						{
-							InsertInCurrentNode( child.m_data[ i ], false );
+							searchResult.Node.InsertInCurrentNode( child.m_data[ i ], false );
 						}
 
 						//Remove the child
-						Left = Right = null;
-						m_height = 0;
+						searchResult.Node.Left = searchResult.Node.Right = null;
+						searchResult.Node.m_height = 0;
 					}
 				}
 				else //Is leaf
@@ -425,8 +434,36 @@ namespace TTree
 				}
 			}
 
-			Rebalance( false, true );
+			searchResult.Node.Rebalance( false, true );
 			return true;
+		}
+
+		private T CutGreatestLowerBound()
+		{
+			if( Right == null )
+			{
+				Count--;
+
+				if( Count == 0 )
+				{
+					//If there is a left node then the parent should now point to it.
+					if( Parent.Right == this )
+						Parent.Right = Left;
+					else
+						Parent.Left = Left;
+
+					if( Left != null )
+						Left.Parent = Parent;
+
+					UpdateHeight( true );
+				}
+
+				return m_data[ Count ];
+			}
+			else
+			{
+				return Right.CutGreatestLowerBound();
+			}
 		}
 
 		private void DeleteFoundValue( SearchResult<T> searchResult )
