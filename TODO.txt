@@ -1,3 +1,2 @@
-1 - Delete
-2 - Updates tests 60,20,20
-3 - Convert search and insert into iterative functions, compare speed (for trees with large orders I dont expect any real speed improvement)
+- Updates tests 60,20,20
+- Convert search and insert into iterative functions, compare speed (for trees with large orders I dont expect any real speed improvement)

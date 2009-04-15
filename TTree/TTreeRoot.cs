@@ -5,6 +5,16 @@ using System.Text;
 
 namespace TTree
 {
+	/// <summary>
+	/// Root of a TTree. This class delegates all calls to the root node of the TTree.
+	/// The reason for using it is that as the TTree is modified and balanced the root 
+	/// node will change. Without this class you would always have to call 
+	/// currentNode.Root.Method(). 
+	/// 
+	/// Using this class means that you are always working with the root node as 
+	/// you should be. 
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	public class TTreeRoot<T> : ITTreeNode<T>
 		where T : IComparable
 	{

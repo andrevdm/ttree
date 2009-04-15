@@ -9,7 +9,16 @@ namespace TTree
 {
 	/// <summary>
 	/// T-Tree implementation.
-	/// Google "A Study of Index Structures for Main Memory Database Management Systems"
+	/// 
+	/// “A T-tree is a balanced index tree data structure optimized for cases where both the 
+	/// index and the actual data are fully kept in memory, just as a B-tree is an index structure 
+	/// optimized for storage on block oriented external storage devices like hard disks. T-trees 
+	/// seek to gain the performance benefits of in-memory tree structures such as AVL trees while 
+	/// avoiding the large storage space overhead which is common to them.” 
+	/// (from http://en.wikipedia.org/wiki/T-tree)
+	///
+	/// Also google “A Study of Index Structures for Main Memory Database Management Systems” 
+	/// for a comprehensive discussion of T-Trees
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	public class TTreeNode<T> : ITTreeNode<T> //visitor, IEnumerable etc
