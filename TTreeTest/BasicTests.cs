@@ -438,6 +438,24 @@ namespace TTreeTest
 			CheckTree<int>( tree.RootNode.Right, 0, new[] { 15 }, false, false, tree.RootNode, 4 );
 		}
 
+		[TestMethod]
+		public void Delete_From_RightLeaf_BecomesEmpty()
+		{
+			var tree = new TTreeRoot<int>( 2, 3 );
+
+			tree.Insert( 1 );
+			tree.Insert( 2 );
+			tree.Insert( 3 );
+			tree.Insert( 4 );
+			tree.Insert( 5 );
+			tree.Insert( 6 );
+			tree.Insert( 7 );
+
+			tree.Delete( 7 );
+
+			CheckTree<int>( tree.RootNode, 1, new[] { 4, 5, 6 }, true, false, null, 4 );
+			CheckTree<int>( tree.RootNode.Left, 0, new[] { 1, 2, 3 }, false, false, tree.RootNode, 4 );
+		}
 		private void CheckTree<T>(
 			TTreeNode<T> tree,
 			int height,
