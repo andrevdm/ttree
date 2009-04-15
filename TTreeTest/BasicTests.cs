@@ -456,6 +456,28 @@ namespace TTreeTest
 			CheckTree<int>( tree.RootNode, 1, new[] { 4, 5, 6 }, true, false, null, 4 );
 			CheckTree<int>( tree.RootNode.Left, 0, new[] { 1, 2, 3 }, false, false, tree.RootNode, 4 );
 		}
+
+		[TestMethod]
+		public void Delete_ShouldRebalance()
+		{
+			var tree = new TTreeRoot<int>( 2, 3 );
+
+			tree.Insert( 10 );
+			tree.Insert( 11 );
+			tree.Insert( 12 );
+			tree.Insert( 1 );
+			tree.Insert( 13 );
+			tree.Insert( 14 );
+			tree.Insert( 15 );
+			tree.Insert( 16 );
+
+			tree.Delete( 1 );
+
+			CheckTree<int>( tree.RootNode, 1, new[] { 13, 14, 15 }, true, true, null, 13 );
+			CheckTree<int>( tree.RootNode.Left, 0, new[] { 10, 11, 12 }, false, false, tree.RootNode, 13 );
+			CheckTree<int>( tree.RootNode.Right, 0, new[] {16 }, false, false, tree.RootNode, 13 );
+		}
+
 		private void CheckTree<T>(
 			TTreeNode<T> tree,
 			int height,

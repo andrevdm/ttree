@@ -366,6 +366,8 @@ namespace TTree
 				return false;
 			}
 
+			TTreeNode<T> rebalanceFrom = searchResult.Node;
+
 			//If the delete will not cause an underflow then, delete the value and stop
 			if( searchResult.Node.Count > searchResult.Node.m_minimum )
 			{
@@ -429,12 +431,15 @@ namespace TTree
 							{
 								searchResult.Node.Parent.Right = null;
 							}
+
+							//The current node has been deleted, so rebalance from its parent
+							rebalanceFrom = rebalanceFrom.Parent;
 						}
 					}
 				}
 			}
 
-			searchResult.Node.Rebalance( false, true );
+			rebalanceFrom.Rebalance( false, true );
 			return true;
 		}
 
