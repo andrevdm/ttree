@@ -12,5 +12,3 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Scope = "type", Target = "TTree.TTreeNode`1" )]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Scope = "type", Target = "TTree.TTreeRoot`1" )]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Design", "CA2210:AssembliesShouldHaveValidStrongNames" )]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1822:MarkMembersAsStatic", Scope = "member", Target = "TTree.TTreeNode`1.#BinarySearch`1(!0[],System.Int32,System.Int32,!!0,System.Func`3<!!0,!0,System.Int32>)" )]
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage( "Microsoft.Performance", "CA1822:MarkMembersAsStatic", Scope = "member", Target = "TTree.TTreeNode`1.#DeleteFoundValue(TTree.SearchResult`1<!0>)" )]
