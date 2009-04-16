@@ -19,6 +19,7 @@ namespace TTreeProfiler
 			Console.WriteLine( "Type of profile" );
 			Console.WriteLine( " 1 - Compare collection performance");
 			Console.WriteLine( " 2 - Insert loop for external profiler" );
+			Console.WriteLine( " 3 - Test for memory profiler" );
 
 			char c = Console.ReadKey( true ).KeyChar;
 
@@ -30,10 +31,42 @@ namespace TTreeProfiler
 				case '2': InsertLoop();
 					break;
 
+				case '3': MemoryTest();
+					break;
+
 				default:
 					Console.WriteLine( "Unknown option: " + c );
 					break;
 			}
+		}
+
+		private static void MemoryTest()
+		{
+			Console.WriteLine( "Number of items? " );
+			int max = int.Parse( Console.ReadLine() );
+
+			Console.WriteLine( "Tree min order (max = min + 3)?" );
+			int orderMin = int.Parse( Console.ReadLine() );
+			
+			TTreeRoot<string> root = new TTreeRoot<string>( orderMin, orderMin + 3 );
+			SortedList<string, string> sortedList = new SortedList<string, string>();
+
+			for( int i = 0; i < max; ++i )
+			{
+				string item = Guid.NewGuid().ToString();
+				root.Add( item );
+
+				sortedList.Add( item, item );
+			}
+
+			Console.WriteLine( "T-Tree root hash code {0}", root.GetHashCode() );
+			Console.WriteLine( "SortedList hash code {0}", sortedList.GetHashCode() );
+
+			Console.WriteLine( "done, press any key to exit" );
+			Console.ReadKey();
+
+			sortedList.Add( "123", "123" );
+			root.Add( "123" );
 		}
 
 		private static void InsertLoop()
@@ -48,7 +81,9 @@ namespace TTreeProfiler
 
 			for( int i = 0; i < max; ++i )
 			{
-				root.Add( Guid.NewGuid().ToString() );
+				string item = Guid.NewGuid().ToString();
+				root.Add( item );
+				root.Search( item );
 			}
 		}
 

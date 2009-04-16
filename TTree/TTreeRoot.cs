@@ -118,7 +118,6 @@ namespace TTree
 		public bool IsInternal { get { return RootNode.IsInternal; } }
 		public int MaxItems { get { return RootNode.MaxItems; } }
 		public TTreeRoot<T> Root { get { return RootNode.Root; } }
-		public Indexer<T> NodeData { get { return RootNode.NodeData; } }
 		public int BalanceFactor { get { return RootNode.BalanceFactor; } }
 		public bool IsReadOnly { get { return RootNode.IsReadOnly; } }
 		#endregion

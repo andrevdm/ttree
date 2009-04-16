@@ -74,7 +74,6 @@ namespace TTree
 		TTreeNode<T> Left { get; }
 		TTreeNode<T> Right { get; }
 		TTreeNode<T> Parent { get;  }
-		Indexer<T> NodeData { get; }
 		int BalanceFactor { get; }
 	}
 }

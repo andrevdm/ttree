@@ -654,7 +654,11 @@ namespace TTreeTest
 			Assert.AreEqual( hasRight, (tree.Right != null), "Invalid has right value" );
 			Assert.AreSame( parent, tree.Parent, "Incorrect parent node" );
 			Assert.AreEqual( height, tree.Height, "Invalid height" );
-			Assert.AreEqual( root1stItem, tree.Root.NodeData[ 0 ], "Invalid root item 0, incorrect root node" );
+
+			var nodeData = new T[ tree.Root.MaxItems ];
+			tree.Root.CopyItems( nodeData, 0 );
+
+			Assert.AreEqual( root1stItem, nodeData[ 0 ], "Invalid root item 0, incorrect root node" );
 		}
 
 		public TestContext TestContext { get; set; }
