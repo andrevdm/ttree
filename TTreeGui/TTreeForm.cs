@@ -62,7 +62,7 @@ namespace TTreeGui
 
 		private void m_deleteButton_Click( object sender, EventArgs e )
 		{
-			m_root.Delete( int.Parse( m_valueTextBox.Text ) );
+			m_root.Remove( int.Parse( m_valueTextBox.Text ) );
 			Redraw();
 
 			ActiveControl = m_valueTextBox;
@@ -73,13 +73,13 @@ namespace TTreeGui
 		{
 			if( !m_valueTextBox.Text.Contains( "," ) )
 			{
-				m_root.Insert( int.Parse( m_valueTextBox.Text ) );
+				m_root.Add( int.Parse( m_valueTextBox.Text ) );
 			}
 			else
 			{
 				foreach( var s in m_valueTextBox.Text.Split( new[] { ',' } ) )
 				{
-					m_root.Insert( int.Parse( s ) );
+					m_root.Add( int.Parse( s ) );
 				}
 			}
 

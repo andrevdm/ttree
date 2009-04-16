@@ -21,7 +21,7 @@ namespace TTree
 	/// for a comprehensive discussion of T-Trees
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class TTreeNode<T> : ITTreeNode<T>, IEnumerable<T> //visitor, IEnumerable etc
+	public class TTreeNode<T> : ITTreeNode<T>
 		where T : IComparable
 	{
 		protected readonly T[] m_data;
@@ -42,27 +42,27 @@ namespace TTree
 				throw new ArgumentNullException( "root" );
 			#endregion
 
-			Count = 0;
+			ItemCount = 0;
 			m_data = new T[ maximum ];
 			m_minimum = minimum;
 			m_root = root;
 																				
 			//Create the node data indexer
-			NodeData = new Indexer<T>( i => m_data[ i ], () => Count );
+			NodeData = new Indexer<T>( i => m_data[ i ], () => ItemCount );
 		}
 
 		/// <summary>
-		/// Inserts the specified item.
+		/// Adds the specified item.
 		/// </summary>
 		/// <param name="item">The item.</param>
 		/// <returns>True if the item was added or false if it already existed and was not </returns>
-		public bool Insert( T item )
+		public bool AddItem( T item )
 		{
 			bool isBoundingNode;
 			int comparedToFirst = 0;
 
 			//Is this the bounding node for the new item? If the node is empty it is considered to be the bounding node.
-			if( Count == 0 )
+			if( ItemCount == 0 )
 			{
 				isBoundingNode = true;
 			}
@@ -70,13 +70,13 @@ namespace TTree
 			{
 				//Compare the item to be inserted to the first item in the data
 				comparedToFirst = item.CompareTo( m_data[ 0 ] );
-				isBoundingNode = ((comparedToFirst >= 0) && (item.CompareTo( m_data[ Count - 1 ] ) <= 0));
+				isBoundingNode = ((comparedToFirst >= 0) && (item.CompareTo( m_data[ ItemCount - 1 ] ) <= 0));
 			}
 
 			if( isBoundingNode )
 			{
 				//Is there space in this node?
-				if( Count < m_data.Length )
+				if( ItemCount < m_data.Length )
 				{
 					//This is the bounding node, add the new item
 					return InsertInCurrentNode( item, false );
@@ -101,7 +101,7 @@ namespace TTree
 					else
 					{
 						//Add the old minimum to the left child
-						return Left.Insert( oldMinimum );
+						return Left.AddItem( oldMinimum );
 					}
 				}
 			}
@@ -110,18 +110,18 @@ namespace TTree
 				//If the item is less than the minimum and there is a left node, follow it
 				if( (Left != null) && (comparedToFirst < 0) )
 				{
-					return Left.Insert( item );
+					return Left.AddItem( item );
 				}
 
 				//If the item is less than the maximum and there is a right node, follow it
 				if( (Right != null) && (comparedToFirst > 0) )
 				{
-					return Right.Insert( item );
+					return Right.AddItem( item );
 				}
 
 				//If we are here then, there is no bounding node for this value.
 				//Is there place in this node
-				if( Count < m_data.Length )
+				if( ItemCount < m_data.Length )
 				{
 					//There is place in this node so add the new value. However since this value
 					// must be the new minimum or maximum (otherwise it would have found a bounding
@@ -131,16 +131,16 @@ namespace TTree
 					{
 						//The item is greater than the minimum, therfore it must be the new maximum.
 						// Add it to the end of the array
-						m_data[ Count ] = item;
+						m_data[ ItemCount ] = item;
 					}
 					else
 					{
 						//The item is the new miminum. Shift the array up and insert it.
-						Array.Copy( m_data, 0, m_data, 1, Count );
+						Array.Copy( m_data, 0, m_data, 1, ItemCount );
 						m_data[ 0 ] = item;
 					}
 
-					Count++;
+					ItemCount++;
 				}
 				else
 				{
@@ -166,6 +166,18 @@ namespace TTree
 		}
 
 		/// <summary>
+		/// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+		/// </summary>
+		/// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+		/// <exception cref="T:System.NotSupportedException">
+		/// The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
+		/// </exception>
+		public void Add( T item )
+		{
+			AddItem( item );
+		}
+
+		/// <summary>
 		/// Inserts an item into the current node. This method can be called in two instances
 		/// 1 - When this node is not full
 		/// 2 - When this node is full and the first item has been copied so that it can be
@@ -176,12 +188,12 @@ namespace TTree
 		/// <returns></returns>
 		private bool InsertInCurrentNode( T item, bool fullShiftToLeft )
 		{
-			Debug.Assert( fullShiftToLeft ? (Count == m_data.Length) : (Count < m_data.Length), "If doing a shift left, the node should have been full, otherwise it should not be called if the node is full" );
+			Debug.Assert( fullShiftToLeft ? (ItemCount == m_data.Length) : (ItemCount < m_data.Length), "If doing a shift left, the node should have been full, otherwise it should not be called if the node is full" );
 
 			//TODO profile and see if there is any advantage to checking the min and max values here and setting closest=0 or closest=Count. Remember to check that the item was not already added
 
 			//Find the position with the closest value to the item being added.
-			int closest = Array.BinarySearch<T>( m_data, 0, Count, item );
+			int closest = Array.BinarySearch<T>( m_data, 0, ItemCount, item );
 
 			//If closest is positive then the item already exists at this level, so
 			// no need to add it again
@@ -193,19 +205,19 @@ namespace TTree
 
 			//If closest is greater than the count then there is no item in the array than the item being added,
 			// so add it to the end of the array. Otherwise the negated value is the position to add the item to
-			if( closest > Count )
-				closest = Count;
+			if( closest > ItemCount )
+				closest = ItemCount;
 
 			if( !fullShiftToLeft )
 			{
 				//Shift the items up by one place to make space for the new item. This also works when adding
 				// an item to the end of the array.
-				Array.Copy( m_data, closest, m_data, closest + 1, Count - closest );
+				Array.Copy( m_data, closest, m_data, closest + 1, ItemCount - closest );
 
 				m_data[ closest ] = item;
 
 				//An item has been added.
-				Count++;
+				ItemCount++;
 			}
 			else
 			{
@@ -274,12 +286,12 @@ namespace TTree
 				var nodeC = Right.Left;
 
 				int maxLen = m_data.Length;
-				int delta = maxLen - nodeC.Count;
-				Array.Copy( nodeB.m_data, 0, nodeC.m_data, nodeC.Count, delta );
-				Array.Copy( nodeB.m_data, delta, nodeB.m_data, 0, nodeC.Count );
+				int delta = maxLen - nodeC.ItemCount;
+				Array.Copy( nodeB.m_data, 0, nodeC.m_data, nodeC.ItemCount, delta );
+				Array.Copy( nodeB.m_data, delta, nodeB.m_data, 0, nodeC.ItemCount );
 
-				nodeB.Count = nodeC.Count;
-				nodeC.Count = maxLen;
+				nodeB.ItemCount = nodeC.ItemCount;
+				nodeC.ItemCount = maxLen;
 			}
 
 			Right.RotateLL();
@@ -295,12 +307,12 @@ namespace TTree
 				var nodeC = Left.Right;
 
 				int maxLen = m_data.Length;
-				int delta = maxLen - nodeC.Count;
-				Array.Copy( nodeC.m_data, 0, nodeC.m_data, delta, nodeC.Count );
-				Array.Copy( nodeB.m_data, nodeC.Count, nodeC.m_data, 0, delta );
+				int delta = maxLen - nodeC.ItemCount;
+				Array.Copy( nodeC.m_data, 0, nodeC.m_data, delta, nodeC.ItemCount );
+				Array.Copy( nodeB.m_data, nodeC.ItemCount, nodeC.m_data, 0, delta );
 
-				nodeB.Count = nodeC.Count;
-				nodeC.Count = maxLen;
+				nodeB.ItemCount = nodeC.ItemCount;
+				nodeC.ItemCount = maxLen;
 			}
 
 			Left.RotateRR();
@@ -369,7 +381,7 @@ namespace TTree
 			UpdateHeight( true );
 		}
 
-		public bool Delete( T item )
+		public bool Remove( T item )
 		{
 			SearchResult<T> searchResult = SearchFor( item );
 
@@ -380,8 +392,8 @@ namespace TTree
 
 			TTreeNode<T> rebalanceFrom = searchResult.Node;
 
-			//If the delete will not cause an underflow then, delete the value and stop
-			if( searchResult.Node.Count > searchResult.Node.m_minimum )
+			//If the remove will not cause an underflow then, delete the value and stop
+			if( searchResult.Node.ItemCount > searchResult.Node.m_minimum )
 			{
 				DeleteFoundValue( searchResult );
 				return true;
@@ -410,10 +422,10 @@ namespace TTree
 					var child = (searchResult.Node.Left == null) ? searchResult.Node.Right : searchResult.Node.Left;
 
 					//If all the child items can fit into this node
-					if( searchResult.Node.Count + child.Count <= MaxItems )
+					if( searchResult.Node.ItemCount + child.ItemCount <= MaxItems )
 					{
 						//TODO consider not looping - the child is sorted, insert all the items at once, either at the begining or at the end (left/right)
-						for( int i = 0; i < child.Count; ++i )
+						for( int i = 0; i < child.ItemCount; ++i )
 						{
 							searchResult.Node.InsertInCurrentNode( child.m_data[ i ], false );
 						}
@@ -425,7 +437,7 @@ namespace TTree
 				}
 				else //Is leaf
 				{
-					if( searchResult.Node.Count != 0 )
+					if( searchResult.Node.ItemCount != 0 )
 					{
 						//This is a non-empty leaf. Nothing more to do
 						return true;
@@ -459,9 +471,9 @@ namespace TTree
 		{
 			if( Right == null )
 			{
-				Count--;
+				ItemCount--;
 
-				if( Count == 0 )
+				if( ItemCount == 0 )
 				{
 					//If there is a left node then the parent should now point to it.
 					if( Parent.Right == this )
@@ -475,7 +487,7 @@ namespace TTree
 					UpdateHeight( true );
 				}
 
-				return m_data[ Count ];
+				return m_data[ ItemCount ];
 			}
 			else
 			{
@@ -486,7 +498,7 @@ namespace TTree
 		private void DeleteFoundValue( SearchResult<T> searchResult )
 		{
 			Array.Copy( searchResult.Node.m_data, searchResult.Index + 1, searchResult.Node.m_data, searchResult.Index, searchResult.Node.m_data.Length - 1 - searchResult.Index );
-			searchResult.Node.Count--;
+			searchResult.Node.ItemCount--;
 		}
 
 		/// <summary>
@@ -504,7 +516,7 @@ namespace TTree
 
 		public SearchResult<T> SearchFor<TSearch>( TSearch item, Func<TSearch, T, int> comparer )
 		{
-			if( Count == 0 )
+			if( ItemCount == 0 )
 				return null;
 
 			int compare = comparer( item, m_data[ 0 ] );
@@ -520,10 +532,10 @@ namespace TTree
 					return null;
 			}
 
-			compare = comparer( item, m_data[ Count - 1 ] );
+			compare = comparer( item, m_data[ ItemCount - 1 ] );
 
 			if( compare == 0 )
-				return new SearchResult<T>( m_data[ Count - 1 ], this, Count - 1 );
+				return new SearchResult<T>( m_data[ ItemCount - 1 ], this, ItemCount - 1 );
 
 			if( compare > 0 )
 			{
@@ -533,7 +545,7 @@ namespace TTree
 					return null;
 			}
 
-			int closest = BinarySearch<TSearch>( m_data, 0, Count, item, comparer );
+			int closest = BinarySearch<TSearch>( m_data, 0, ItemCount, item, comparer );
 
 			if( closest >= 0 )
 				return new SearchResult<T>( m_data[ closest ], this, closest );
@@ -556,7 +568,7 @@ namespace TTree
 		{
 			//This code is not shared with the other Search() method to keep things as fast as possible
 
-			if( Count == 0 )
+			if( ItemCount == 0 )
 				return null;
 
 			int compare = item.CompareTo( m_data[ 0 ] );
@@ -572,10 +584,10 @@ namespace TTree
 					return null;
 			}
 
-			compare = item.CompareTo( m_data[ Count - 1 ] );
+			compare = item.CompareTo( m_data[ ItemCount - 1 ] );
 
 			if( compare == 0 )
-				return new SearchResult<T>( m_data[ Count - 1 ], this, Count - 1 );
+				return new SearchResult<T>( m_data[ ItemCount - 1 ], this, ItemCount - 1 );
 
 			if( compare > 0 )
 			{
@@ -585,7 +597,7 @@ namespace TTree
 					return null;
 			}
 
-			int closest = Array.BinarySearch<T>( m_data, 0, Count, item );
+			int closest = Array.BinarySearch<T>( m_data, 0, ItemCount, item );
 
 			if( closest >= 0 )
 				return new SearchResult<T>( m_data[ closest ], this, closest );
@@ -593,9 +605,69 @@ namespace TTree
 			return null;
 		}
 
+		/// <summary>
+		/// Copies the items from the current node only
+		/// </summary>
+		/// <param name="destinationArray">The destination array.</param>
+		/// <param name="index">The index.</param>
 		public void CopyItems( T[] destinationArray, int index )
 		{
 			m_data.CopyTo( destinationArray, index );
+		}
+
+		/// <summary>
+		/// Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+		/// </summary>
+		/// <exception cref="T:System.NotSupportedException">
+		/// The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
+		/// </exception>
+		public void Clear()
+		{
+			ItemCount = 0;
+			Left = Right = null;
+			m_height = 0;
+
+			UpdateHeight( true );
+		}
+
+		/// <summary>
+		/// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
+		/// </summary>
+		/// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+		/// <returns>
+		/// true if <paramref name="item"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false.
+		/// </returns>
+		public bool Contains( T item )
+		{
+			return (SearchFor( item ) != null);
+		}
+
+		/// <summary>
+		/// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
+		/// </summary>
+		/// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"/>. The <see cref="T:System.Array"/> must have zero-based indexing.</param>
+		/// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+		/// <exception cref="T:System.ArgumentNullException">
+		/// 	<paramref name="array"/> is null.
+		/// </exception>
+		/// <exception cref="T:System.ArgumentOutOfRangeException">
+		/// 	<paramref name="arrayIndex"/> is less than 0.
+		/// </exception>
+		/// <exception cref="T:System.ArgumentException">
+		/// 	<paramref name="array"/> is multidimensional.
+		/// -or-
+		/// <paramref name="arrayIndex"/> is equal to or greater than the length of <paramref name="array"/>.
+		/// -or-
+		/// The number of elements in the source <see cref="T:System.Collections.Generic.ICollection`1"/> is greater than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.
+		/// -or-
+		/// Type <paramref name="T"/> cannot be cast automatically to the type of the destination <paramref name="array"/>.
+		/// </exception>
+		public void CopyTo( T[] array, int arrayIndex )
+		{
+			foreach( T item in this )
+			{
+				array[ arrayIndex++ ] = item;
+			}
 		}
 
 		public string ToDot()
@@ -626,7 +698,7 @@ namespace TTree
 					dot.Append( "| " );
 				}
 
-				if( i < Count )
+				if( i < ItemCount )
 				{
 					dot.AppendFormat( "{0}", toString( m_data[ i ] ) );
 				}
@@ -660,7 +732,7 @@ namespace TTree
 			//Create a new child node
 			TTreeNode<T> newChild = new TTreeNode<T>( m_minimum, m_data.Length, Root );
 			newChild.m_data[ 0 ] = item;
-			newChild.Count = 1;
+			newChild.ItemCount = 1;
 			newChild.Parent = this;
 
 			return newChild;
@@ -668,9 +740,7 @@ namespace TTree
 
 		private void UpdateHeight( bool updateAllUpwards )
 		{
-			//int oldHeight = m_height;
-
-			if( Count == 0 )
+			if( ItemCount == 0 )
 			{
 				m_height = -1;
 			}
@@ -724,7 +794,7 @@ namespace TTree
 		{
 			get
 			{
-				if( Count == 0 )
+				if( ItemCount == 0 )
 				{
 					return 0;
 				}
@@ -738,7 +808,7 @@ namespace TTree
 			}
 		}
 
-		#region IEnumerable
+		#region IEnumerable<T>
 		public IEnumerator<T> GetEnumerator()
 		{
 			if( Left != null )
@@ -747,7 +817,7 @@ namespace TTree
 					yield return item;
 			}
 
-			for( int i = 0; i < Count; ++i )
+			for( int i = 0; i < ItemCount; ++i )
 				yield return m_data[ i ];
 
 			if( Right != null )
@@ -763,8 +833,39 @@ namespace TTree
 		}
 		#endregion
 
+		/// <summary>
+		/// Gets the number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+		/// </summary>
+		/// <value></value>
+		/// <returns>
+		/// The number of elements contained in the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+		/// </returns>
+		public int Count
+		{
+			get
+			{
+				int count = ItemCount;
+
+				if( Right != null )
+					count += Right.Count;
+
+				if( Left != null )
+					count += Left.Count;
+
+				return count;
+			}
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
+		/// </summary>
+		/// <value></value>
+		/// <returns>true if the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only; otherwise, false.
+		/// </returns>
+		public bool IsReadOnly { get { return false; } }
+
 		public int Height { get { return m_height; } }
-		public int Count { get; protected set; }
+		public int ItemCount { get; protected set; }
 		public int MaxItems { get { return m_data.Length; } }
 		public TTreeNode<T> Left { get; set; }
 		public TTreeNode<T> Right { get; set; }

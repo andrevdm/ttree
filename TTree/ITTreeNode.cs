@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TTree
 {
@@ -6,16 +7,15 @@ namespace TTree
 	/// Implemented by TTreeNodes and the TTreeRoot
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public interface ITTreeNode<T> 
+	public interface ITTreeNode<T> : ICollection<T> 
 		where T : IComparable
 	{
-
 		/// <summary>
-		/// Inserts the specified item.
+		/// Adds the specified item.
 		/// </summary>
 		/// <param name="item">The item.</param>
 		/// <returns>True if the item was added or false if it already existed and was not </returns>
-		bool Insert( T item );
+		bool AddItem( T item );
 
 		/// <summary>
 		/// Search for an item using a custom comparison function
@@ -49,12 +49,22 @@ namespace TTree
 		/// <returns></returns>
 		T Search( T item );
 
+		/// <summary>
+		/// Copies the items from the current node only
+		/// </summary>
+		/// <param name="destinationArray">The destination array.</param>
+		/// <param name="index">The index.</param>
 		void CopyItems( T[] destinationArray, int index );
-		bool Delete( T item );
+
+		/// <summary>
+		/// Gets number of items in this node
+		/// </summary>
+		/// <value>The item count.</value>
+		int ItemCount { get; }
+
 		string ToDot( Func<T, string> toString );
 		string ToDot();
 
-		int Count { get; }
 		int Height { get; }
 		bool IsLeaf { get; }
 		bool IsHalfLeaf { get; }

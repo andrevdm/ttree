@@ -16,7 +16,7 @@ namespace TTree
 	/// you should be. 
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class TTreeRoot<T> : ITTreeNode<T>, IEnumerable<T>
+	public class TTreeRoot<T> : ITTreeNode<T>
 		where T : IComparable
 	{
 		public TTreeRoot( int minimum, int maximum )
@@ -27,9 +27,9 @@ namespace TTree
 		public TTreeNode<T> RootNode { get; protected internal set; }
 
 		#region ITreeNode delegating to actual root node
-		public bool Insert( T item )
+		public bool AddItem( T item )
 		{
-			return RootNode.Insert( item );
+			return RootNode.AddItem( item );
 		}
 
 		public T Search<TSearch>( TSearch item, Func<TSearch, T, int> comparer )
@@ -57,9 +57,29 @@ namespace TTree
 			RootNode.CopyItems( destinationArray, index );
 		}
 
-		public bool Delete( T item )
+		public bool Remove( T item )
 		{
-			return RootNode.Delete( item );
+			return RootNode.Remove( item );
+		}
+
+		public void Add( T item )
+		{
+			RootNode.Add( item );
+		}
+
+		public void Clear()
+		{
+			RootNode.Clear();
+		}
+
+		public bool Contains( T item )
+		{
+			return RootNode.Contains( item );
+		}
+
+		public void CopyTo( T[] array, int arrayIndex )
+		{
+			RootNode.CopyTo( array, arrayIndex );
 		}
 
 		public string ToDot( Func<T, string> toString )
@@ -72,44 +92,9 @@ namespace TTree
 			return RootNode.ToDot();
 		}
 
-		public int Count
-		{
-			get { return RootNode.Count; }
-		}
-
-		public int Height
-		{
-			get { return RootNode.Count; }
-		}
-
-		public bool IsLeaf
-		{
-			get { return RootNode.IsLeaf; }
-		}
-
-		public bool IsHalfLeaf
-		{
-			get { return RootNode.IsHalfLeaf; }
-		}
-
-		public bool IsInternal
-		{
-			get { return RootNode.IsInternal; }
-		}
-
-		public int MaxItems
-		{
-			get { return RootNode.MaxItems; }
-		}
-
-		public TTreeRoot<T> Root
-		{
-			get { return RootNode.Root; }
-		}
-
 		public TTreeNode<T> Left
 		{
-			get{return RootNode.Left; }
+			get { return RootNode.Left; }
 			set { RootNode.Left = value; }
 		}
 
@@ -125,15 +110,17 @@ namespace TTree
 			set { RootNode.Parent = value; }
 		}
 
-		public Indexer<T> NodeData
-		{
-			get { return RootNode.NodeData; }
-		}
-
-		public int BalanceFactor
-		{
-			get { return RootNode.BalanceFactor; }
-		}
+		public int Count { get { return RootNode.Count; } }
+		public int ItemCount { get { return RootNode.ItemCount; } }
+		public int Height { get { return RootNode.ItemCount; } }
+		public bool IsLeaf { get { return RootNode.IsLeaf; } }
+		public bool IsHalfLeaf { get { return RootNode.IsHalfLeaf; } }
+		public bool IsInternal { get { return RootNode.IsInternal; } }
+		public int MaxItems { get { return RootNode.MaxItems; } }
+		public TTreeRoot<T> Root { get { return RootNode.Root; } }
+		public Indexer<T> NodeData { get { return RootNode.NodeData; } }
+		public int BalanceFactor { get { return RootNode.BalanceFactor; } }
+		public bool IsReadOnly { get { return RootNode.IsReadOnly; } }
 		#endregion
 
 		#region IEnumerable delegating to root node
