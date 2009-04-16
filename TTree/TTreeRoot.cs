@@ -124,9 +124,9 @@ namespace TTree
 			set { RootNode.Parent = value; }
 		}
 
-		public T this[ int index ]
+		public Indexer<T> NodeData
 		{
-			get { return RootNode[ index ]; }
+			get { return RootNode.NodeData; }
 		}
 
 		public int BalanceFactor

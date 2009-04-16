@@ -64,7 +64,7 @@ namespace TTree
 		TTreeNode<T> Left { get; set; }
 		TTreeNode<T> Right { get; set; }
 		TTreeNode<T> Parent { get; set; }
-		T this[ int index ] { get; }
+		Indexer<T> NodeData { get; }
 		int BalanceFactor { get; }
 	}
 }

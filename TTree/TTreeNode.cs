@@ -46,6 +46,9 @@ namespace TTree
 			m_data = new T[ maximum ];
 			m_minimum = minimum;
 			m_root = root;
+																				
+			//Create the node data indexer
+			NodeData = new Indexer<T>( i => m_data[ i ], () => Count );
 		}
 
 		/// <summary>
@@ -744,7 +747,7 @@ namespace TTree
 		public TTreeRoot<T> Root { get { return m_root; } }
 		public bool IsLeaf { get { return (Left == null) && (Right == null); } }
 		public bool IsHalfLeaf { get { return !IsLeaf && ((Left == null) || (Right == null)); } }
-		public bool IsInternal { get { return (Left != null) && (Right != null); } } 
-		public T this[ int index ] { get { return m_data[ index ]; } } //TODO change to be Values[]
+		public bool IsInternal { get { return (Left != null) && (Right != null); } }
+		public Indexer<T> NodeData { get; private set; }
 	}
 }
