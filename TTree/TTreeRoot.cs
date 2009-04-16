@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections;
 
 namespace TTree
 {
@@ -15,7 +16,7 @@ namespace TTree
 	/// you should be. 
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class TTreeRoot<T> : ITTreeNode<T>
+	public class TTreeRoot<T> : ITTreeNode<T>, IEnumerable<T>
 		where T : IComparable
 	{
 		public TTreeRoot( int minimum, int maximum )
@@ -132,6 +133,18 @@ namespace TTree
 		public int BalanceFactor
 		{
 			get { return RootNode.BalanceFactor; }
+		}
+		#endregion
+
+		#region IEnumerable delegating to root node
+		public IEnumerator<T> GetEnumerator()
+		{
+			return RootNode.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return RootNode.GetEnumerator();
 		}
 		#endregion
 	}

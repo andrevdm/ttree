@@ -478,6 +478,35 @@ namespace TTreeTest
 			CheckTree<int>( tree.RootNode.Right, 0, new[] {16 }, false, false, tree.RootNode, 13 );
 		}
 
+		[TestMethod]
+		public void IEnumerable()
+		{
+			var tree = new TTreeRoot<int>( 2, 2 );
+
+			tree.Insert( 5 );
+			tree.Insert( 3 );
+			tree.Insert( 10 );
+			tree.Insert( 1 );
+			tree.Insert( 7 );
+			tree.Insert( 20 );
+			tree.Insert( 100 );
+
+			var items = new List<int>();
+
+			foreach( int i in tree )
+			{
+				items.Add( i );
+			}
+
+			Assert.AreEqual( 1, items[ 0 ], "Invalid value at 0" );
+			Assert.AreEqual( 3, items[ 1 ], "Invalid value at 1" );
+			Assert.AreEqual( 5, items[ 2 ], "Invalid value at 2" );
+			Assert.AreEqual( 7, items[ 3 ], "Invalid value at 3" );
+			Assert.AreEqual( 10, items[ 4 ], "Invalid value at 4" );
+			Assert.AreEqual( 20, items[ 5 ], "Invalid value at 5" );
+			Assert.AreEqual( 100, items[ 6 ], "Invalid value at 6" );
+		}
+
 		private void CheckTree<T>(
 			TTreeNode<T> tree,
 			int height,

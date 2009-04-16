@@ -21,7 +21,7 @@ namespace TTree
 	/// for a comprehensive discussion of T-Trees
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class TTreeNode<T> : ITTreeNode<T> //visitor, IEnumerable etc
+	public class TTreeNode<T> : ITTreeNode<T>, IEnumerable<T> //visitor, IEnumerable etc
 		where T : IComparable
 	{
 		protected readonly T[] m_data;
@@ -737,6 +737,31 @@ namespace TTree
 				}
 			}
 		}
+
+		#region IEnumerable
+		public IEnumerator<T> GetEnumerator()
+		{
+			if( Left != null )
+			{
+				foreach( var item in Left )
+					yield return item;
+			}
+
+			for( int i = 0; i < Count; ++i )
+				yield return m_data[ i ];
+
+			if( Right != null )
+			{
+				foreach( var item in Right )
+					yield return item;
+			}
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
+		#endregion
 
 		public int Height { get { return m_height; } }
 		public int Count { get; protected set; }
