@@ -105,7 +105,8 @@ namespace TTreeProfiler
 			profiler.AddCombine( "add", 25 );
 			profiler.AddCombine( "search", 75 );
 
-			int[][] ttreeOrders = new int[][] { new[] { 40, 43 }, new[] { 97, 100 }, new[] { 17, 20 }, new[] { 7, 10 }, new[] { 497, 500 }, new[] { 2000, 2003 }, };
+			//int[][] ttreeOrders = new int[][] { new[] { 40, 43 }, new[] { 97, 100 }, new[] { 17, 20 }, new[] { 7, 10 }, new[] { 497, 500 }, new[] { 2000, 2003 }, };
+			int[][] ttreeOrders = new int[][] { new[] { 97, 100 }, new[] { 17, 20 }, new[] { 7, 10 }, new[] { 497, 500 }, new[] { 2000, 2003 }, };
 			List<TTreeRoot<string>> trees = new List<TTreeRoot<string>>();
 
 			for( int tpos = 0; tpos < ttreeOrders.Length; ++tpos )
@@ -120,21 +121,13 @@ namespace TTreeProfiler
 			}
 
 
-			var list = new List<string>();
+			/*var list = new List<string>();
 			profiler.Add( "add", "List<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => list.Add( s ), values.Count, i ) );
 			profiler.Add( "search", "List<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => list.IndexOf( s ), list.Count - 1, i ) );
-
-			//var dict = new Dictionary<string, string>();
-			//profiler.Add( "add", "Dictionary<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => dict.Add( s, s ), values.Count, i ) );
-			//profiler.Add( "search", "Dictionary<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => { string x = dict[ s ]; }, dict.Count - 1, i ) );
 
 			var sortedList = new SortedList<string, string>();
 			profiler.Add( "add", "SortedList<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => sortedList.Add( s, s ), values.Count, i ) );
 			profiler.Add( "search", "SortedList<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => { sortedList.IndexOfKey( s ); }, sortedList.Count - 1, i ) );
-
-			//var sortedDictionary = new SortedDictionary<string, string>();
-			//profiler.Add( "add", "SortedDictionary<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => sortedDictionary.Add( s, s ), values.Count, i ) );
-			//profiler.Add( "search", "SortedDictionary<>", i => Time( values, seconds, i.Desc + " - " + i.Group, s => { string x = sortedDictionary[ s ]; }, sortedDictionary.Count - 1, i ) );
 
 			var arrayList = new ArrayList();
 			profiler.Add( "add", "ArrayList", i => Time( values, seconds, i.Desc + " - " + i.Group, s => arrayList.Add( s ), values.Count, i ) );
@@ -143,7 +136,7 @@ namespace TTreeProfiler
 			var array = new string[ max ];
 			profiler.Add( "add", "array[]", i => Time( values, seconds, i.Desc + " - " + i.Group, s => array[ i.Count ] = s, values.Count, i ) );
 			profiler.Add( "search", "array[]", i => Time( values, seconds, i.Desc + " - " + i.Group, s => { var x = (from a in array where a == s select a).First(); }, array.Length - 1, i ) );
-
+			*/
 			profiler.Profile();
 			Console.WriteLine();
 			Console.WriteLine( "----" );
