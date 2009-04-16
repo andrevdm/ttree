@@ -24,16 +24,16 @@ namespace TTree
 	public class TTreeNode<T> : ITTreeNode<T>
 		where T : IComparable
 	{
-		protected readonly T[] m_data;
-		protected readonly int m_minimum;
-		protected int m_height = 0;
-		protected readonly TTreeRoot<T> m_root;
+		private readonly T[] m_data;
+		private readonly int m_minimum;
+		private int m_height = 0;
+		private readonly TTreeRoot<T> m_root;
 
 		public TTreeNode( int minimum, int maximum, TTreeRoot<T> root )
 		{
 			#region param checks
 			if( minimum < 1 )
-				throw new ArgumentOutOfRangeException( "order", "Expecting an order of at least 1." );
+				throw new ArgumentOutOfRangeException( "minimum", "Expecting a minimum of at least 1." );
 
 			if( maximum < minimum )
 				throw new ArgumentOutOfRangeException( "maximum", "Maximum value must be greater than the minimum. " );
@@ -867,9 +867,9 @@ namespace TTree
 		public int Height { get { return m_height; } }
 		public int ItemCount { get; protected set; }
 		public int MaxItems { get { return m_data.Length; } }
-		public TTreeNode<T> Left { get; set; }
-		public TTreeNode<T> Right { get; set; }
-		public TTreeNode<T> Parent { get; set; }
+		public TTreeNode<T> Left { get; internal set; }
+		public TTreeNode<T> Right { get; internal set; }
+		public TTreeNode<T> Parent { get; internal set; }
 		public TTreeRoot<T> Root { get { return m_root; } }
 		public bool IsLeaf { get { return (Left == null) && (Right == null); } }
 		public bool IsHalfLeaf { get { return !IsLeaf && ((Left == null) || (Right == null)); } }

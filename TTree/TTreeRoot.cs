@@ -24,7 +24,7 @@ namespace TTree
 			RootNode = new TTreeNode<T>( minimum, maximum, this );
 		}
 
-		public TTreeNode<T> RootNode { get; protected internal set; }
+		public TTreeNode<T> RootNode { get; internal set; }
 
 		#region ITreeNode delegating to actual root node
 		public bool AddItem( T item )
@@ -95,19 +95,19 @@ namespace TTree
 		public TTreeNode<T> Left
 		{
 			get { return RootNode.Left; }
-			set { RootNode.Left = value; }
+			internal set { RootNode.Left = value; }
 		}
 
 		public TTreeNode<T> Right
 		{
 			get { return RootNode.Right; }
-			set { RootNode.Right = value; }
+			internal set { RootNode.Right = value; }
 		}
 
 		public TTreeNode<T> Parent
 		{
 			get { return RootNode.Parent; }
-			set { RootNode.Parent = value; }
+			internal set { RootNode.Parent = value; }
 		}
 
 		public int Count { get { return RootNode.Count; } }

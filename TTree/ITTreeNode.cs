@@ -71,9 +71,9 @@ namespace TTree
 		bool IsInternal { get; }
 		int MaxItems { get; }
 		TTreeRoot<T> Root { get; }
-		TTreeNode<T> Left { get; set; }
-		TTreeNode<T> Right { get; set; }
-		TTreeNode<T> Parent { get; set; }
+		TTreeNode<T> Left { get; }
+		TTreeNode<T> Right { get; }
+		TTreeNode<T> Parent { get;  }
 		Indexer<T> NodeData { get; }
 		int BalanceFactor { get; }
 	}
