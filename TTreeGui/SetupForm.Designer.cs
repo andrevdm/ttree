@@ -55,7 +55,7 @@
 			this.m_graphvizPathTextBox.Name = "m_graphvizPathTextBox";
 			this.m_graphvizPathTextBox.Size = new System.Drawing.Size( 315, 20 );
 			this.m_graphvizPathTextBox.TabIndex = 1;
-			this.m_graphvizPathTextBox.Text = "C:\\Program Files (x86)\\Graphviz2.22\\bin\\dot.exe";
+			
 			// 
 			// m_browseForDotButton
 			// 
