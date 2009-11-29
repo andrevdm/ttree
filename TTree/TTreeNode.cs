@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Collections;
@@ -17,7 +16,7 @@ namespace TTree
 	/// avoiding the large storage space overhead which is common to them.” 
 	/// (from http://en.wikipedia.org/wiki/T-tree)
 	///
-	/// Also google “A Study of Index Structures for Main Memory Database Management Systems” 
+	/// Google for “A Study of Index Structures for Main Memory Database Management Systems” 
 	/// for a comprehensive discussion of T-Trees
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
@@ -76,14 +75,14 @@ namespace TTree
 				if( ItemCount < m_data.Length )
 				{
 					//This is the bounding node, add the new item
-					return InsertInCurrentNode( item, false );
+                    return InsertInCurrentNode( item, ShiftType.NoShift );
 				}
 				else
 				{
 					//Copy the old minimum. This current item will be inserted into this node
 					T oldMinimum = m_data[ 0 ];
 
-					if( !InsertInCurrentNode( item, true ) )
+                    if ( !InsertInCurrentNode( item, ShiftType.FullShiftToLeft ) )
 						return false;
 
 					//Add the old minimum
@@ -91,8 +90,8 @@ namespace TTree
 					{
 						//There is no left child, so create it
 						Left = CreateChild( oldMinimum );
-						UpdateHeight( false );
-						Rebalance( true, false );
+                        UpdateHeight(HeightUpdateType.CurrentLevelOnly);
+                        Rebalance( BalanceType.StopAfterFirstRotate );
 						return true;
 					}
 					else
@@ -153,8 +152,8 @@ namespace TTree
 						Right = newChild;
 					}
 
-					UpdateHeight( true );
-					Rebalance( true, false );
+					UpdateHeight( HeightUpdateType.UpdateAllUpwards );
+                    Rebalance( BalanceType.StopAfterFirstRotate );
 					return true;
 				}
 			}
@@ -181,11 +180,12 @@ namespace TTree
 		/// used as the new insert value. 
 		/// </summary>
 		/// <param name="item">The item.</param>
-		/// <param name="fullShiftToLeft">if set to <c>true</c> [full shift to left].</param>
+		/// <param name="shiftType">if set to <c>true</c> [full shift to left].</param>
 		/// <returns></returns>
-		private bool InsertInCurrentNode( T item, bool fullShiftToLeft )
+        private bool InsertInCurrentNode( T item, ShiftType shiftType )
 		{
-			Debug.Assert( fullShiftToLeft ? (ItemCount == m_data.Length) : (ItemCount < m_data.Length), "If doing a shift left, the node should have been full, otherwise it should not be called if the node is full" );
+            bool fullShiftToLeft = (shiftType == ShiftType.FullShiftToLeft);
+            Debug.Assert( fullShiftToLeft ? (ItemCount == m_data.Length) : (ItemCount < m_data.Length), "If doing a shift left, the node should have been full, otherwise it should not be called if the node is full" );
 
 			//TODO profile and see if there is any advantage to checking the min and max values here and setting closest=0 or closest=Count. Remember to check that the item was not already added
 
@@ -205,7 +205,7 @@ namespace TTree
 			if( closest > ItemCount )
 				closest = ItemCount;
 
-			if( !fullShiftToLeft )
+            if ( !fullShiftToLeft )
 			{
 				//Shift the items up by one place to make space for the new item. This also works when adding
 				// an item to the end of the array.
@@ -226,8 +226,12 @@ namespace TTree
 			return true;
 		}
 
-		private void Rebalance( bool stopAfterFirstRotate, bool stopAfterEvenBalanceFound )
+        //private void Rebalance( bool stopAfterFirstRotate, bool stopAfterEvenBalanceFound )
+        private void Rebalance( BalanceType balanceType )
 		{
+            bool stopAfterFirstRotate = ((balanceType & BalanceType.StopAfterFirstRotate) != 0);
+            bool stopAfterEvenBalanceFound = ((balanceType & BalanceType.StopAfterEvenBalanceFound) != 0);
+
 			if( BalanceFactor > 1 )
 			{
 				if( Left.BalanceFactor > 0 )
@@ -270,7 +274,7 @@ namespace TTree
 
 			if( Parent != null )
 			{
-				Parent.Rebalance( true, false );
+				Parent.Rebalance( BalanceType.StopAfterFirstRotate );
 			}
 		}
 
@@ -279,16 +283,16 @@ namespace TTree
 			//Check if a T-Tree sliding rotate must be done first.
 			if( IsHalfLeaf && Right.IsHalfLeaf && Right.Left.IsLeaf )
 			{
-				var nodeB = Right;
-				var nodeC = Right.Left;
+				var nodeRight = Right;
+				var nodeRightsLeft = Right.Left;
 
 				int maxLen = m_data.Length;
-				int delta = maxLen - nodeC.ItemCount;
-				Array.Copy( nodeB.m_data, 0, nodeC.m_data, nodeC.ItemCount, delta );
-				Array.Copy( nodeB.m_data, delta, nodeB.m_data, 0, nodeC.ItemCount );
+				int delta = maxLen - nodeRightsLeft.ItemCount;
+				Array.Copy( nodeRight.m_data, 0, nodeRightsLeft.m_data, nodeRightsLeft.ItemCount, delta );
+				Array.Copy( nodeRight.m_data, delta, nodeRight.m_data, 0, nodeRightsLeft.ItemCount );
 
-				nodeB.ItemCount = nodeC.ItemCount;
-				nodeC.ItemCount = maxLen;
+				nodeRight.ItemCount = nodeRightsLeft.ItemCount;
+				nodeRightsLeft.ItemCount = maxLen;
 			}
 
 			Right.RotateLL();
@@ -300,16 +304,16 @@ namespace TTree
 			//Check if a T-Tree sliding rotate must be done first.
 			if( IsHalfLeaf && Left.IsHalfLeaf && Left.Right.IsLeaf )
 			{
-				var nodeB = Left;
-				var nodeC = Left.Right;
+				var nodeLeft = Left;
+				var nodeLeftsRight = Left.Right;
 
 				int maxLen = m_data.Length;
-				int delta = maxLen - nodeC.ItemCount;
-				Array.Copy( nodeC.m_data, 0, nodeC.m_data, delta, nodeC.ItemCount );
-				Array.Copy( nodeB.m_data, nodeC.ItemCount, nodeC.m_data, 0, delta );
+				int delta = maxLen - nodeLeftsRight.ItemCount;
+				Array.Copy( nodeLeftsRight.m_data, 0, nodeLeftsRight.m_data, delta, nodeLeftsRight.ItemCount );
+				Array.Copy( nodeLeft.m_data, nodeLeftsRight.ItemCount, nodeLeftsRight.m_data, 0, delta );
 
-				nodeB.ItemCount = nodeC.ItemCount;
-				nodeC.ItemCount = maxLen;
+				nodeLeft.ItemCount = nodeLeftsRight.ItemCount;
+				nodeLeftsRight.ItemCount = maxLen;
 			}
 
 			Left.RotateRR();
@@ -318,33 +322,33 @@ namespace TTree
 
 		private void RotateRR()
 		{
-			TTreeNode<T> b = Right;
-			TTreeNode<T> c = b.Left;
+			TTreeNode<T> nodeRight = Right;
+			TTreeNode<T> nodeRightsLeft = nodeRight.Left;
 
 			if( Parent != null )
 			{
 				if( Parent.Left == this )
-					Parent.Left = b;
+					Parent.Left = nodeRight;
 				else
-					Parent.Right = b;
+					Parent.Right = nodeRight;
 			}
 
-			b.Parent = Parent;
-			b.Left = this;
-			Parent = b;
-			Right = c;
+			nodeRight.Parent = Parent;
+			nodeRight.Left = this;
+			Parent = nodeRight;
+			Right = nodeRightsLeft;
 
-			if( c != null )
+			if( nodeRightsLeft != null )
 			{
-				c.Parent = this;
+				nodeRightsLeft.Parent = this;
 			}
 
-			if( b.Parent == null )
+			if( nodeRight.Parent == null )
 			{
-				Root.RootNode = b;
+				Root.RootNode = nodeRight;
 			}
 
-			UpdateHeight( true );
+            UpdateHeight(HeightUpdateType.UpdateAllUpwards);
 		}
 
 		private void RotateLL()
@@ -375,7 +379,7 @@ namespace TTree
 				Root.RootNode = left;
 			}
 
-			UpdateHeight( true );
+            UpdateHeight(HeightUpdateType.UpdateAllUpwards);
 		}
 
 		public bool Remove( T item )
@@ -416,7 +420,7 @@ namespace TTree
 				//If this is a half leaf and it can be merged with a leaf, then combine
 				if( searchResult.Node.IsHalfLeaf )
 				{
-					var child = (searchResult.Node.Left == null) ? searchResult.Node.Right : searchResult.Node.Left;
+					var child = searchResult.Node.Left ?? searchResult.Node.Right;
 
 					//If all the child items can fit into this node
 					if( searchResult.Node.ItemCount + child.ItemCount <= MaxItems )
@@ -424,7 +428,7 @@ namespace TTree
 						//TODO consider not looping - the child is sorted, insert all the items at once, either at the begining or at the end (left/right)
 						for( int i = 0; i < child.ItemCount; ++i )
 						{
-							searchResult.Node.InsertInCurrentNode( child.m_data[ i ], false );
+                            searchResult.Node.InsertInCurrentNode( child.m_data[i], ShiftType.NoShift );
 						}
 
 						//Remove the child
@@ -460,7 +464,7 @@ namespace TTree
 				}
 			}
 
-			rebalanceFrom.Rebalance( false, true );
+            rebalanceFrom.Rebalance( BalanceType.StopAfterEvenBalanceFound );
 			return true;
 		}
 
@@ -481,7 +485,7 @@ namespace TTree
 					if( Left != null )
 						Left.Parent = Parent;
 
-					UpdateHeight( true );
+                    UpdateHeight( HeightUpdateType.UpdateAllUpwards );
 				}
 
 				return m_data[ ItemCount ];
@@ -624,7 +628,7 @@ namespace TTree
 			Left = Right = null;
 			m_height = 0;
 
-			UpdateHeight( true );
+            UpdateHeight( HeightUpdateType.UpdateAllUpwards );
 		}
 
 		/// <summary>
@@ -735,27 +739,27 @@ namespace TTree
 			return newChild;
 		}
 
-		private void UpdateHeight( bool updateAllUpwards )
-		{
-			if( ItemCount == 0 )
-			{
-				m_height = -1;
-			}
-			else
-			{
-				int lheight = (Left != null) ? (Left.Height) : -1;
-				int rheight = (Right != null) ? (Right.Height) : -1;
+        private void UpdateHeight(HeightUpdateType updateType)
+        {
+            if( ItemCount == 0 )
+            {
+                m_height = -1;
+            }
+            else
+            {
+                int lheight = (Left != null) ? (Left.Height) : -1;
+                int rheight = (Right != null) ? (Right.Height) : -1;
 
-				m_height = 1 + Math.Max( lheight, rheight );
-			}
+                m_height = 1 + Math.Max( lheight, rheight );
+            }
 
-			if( updateAllUpwards && (Parent != null) )
-			{
-				Parent.UpdateHeight( updateAllUpwards );
-			}
-		}
+            if( (updateType == HeightUpdateType.UpdateAllUpwards) && (Parent != null) )
+            {
+                Parent.UpdateHeight( updateType );
+            }
+        }
 
-		/// <summary>
+	    /// <summary>
 		/// Binary search implementation using a custom compare function
 		/// </summary>
 		/// <typeparam name="TSearch">The type of the search.</typeparam>
