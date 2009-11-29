@@ -17,7 +17,7 @@ namespace TTreeGui
 	public partial class TTreeForm : Form
 	{
 		private readonly string m_dotPath;
-		private TTreeRoot<int> m_root;
+		private TTree<int> m_root;
 		private string m_oldDot = null;
 
 		public TTreeForm( string dotPath, int min, int max )
@@ -27,7 +27,7 @@ namespace TTreeGui
 			DeleteOldFiles();
 
 			m_dotPath = dotPath;
-			m_root = new TTreeRoot<int>( min, max );
+			m_root = new TTree<int>( min, max );
 			m_oldDot = m_root.ToDot();
 			Redraw();
 		}

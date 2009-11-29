@@ -2,18 +2,19 @@
 
 namespace TTree
 {
-	public class SearchResult<T>
-		where T : IComparable
+	public class SearchResult<TItem,TNode>
+		where TItem : IComparable
+        where TNode : TTreeNode<TItem, TNode>
 	{
-		public SearchResult( T value, TTreeNode<T> node, int index )
+        public SearchResult( TItem value, TTreeNode<TItem,TNode> node, int index )
 		{
 			Value = value;
 			Node = node;
 			Index = index;
 		}
 
-		public T Value { get; private set; }
-		public TTreeNode<T> Node { get; private set; }
+        public TItem Value { get; private set; }
+		public TTreeNode<TItem,TNode> Node { get; private set; }
 		public int Index { get; private set; }
 	}
 }

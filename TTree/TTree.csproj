@@ -55,7 +55,7 @@
     <Compile Include="SearchResult.cs" />
     <Compile Include="ShiftType.cs" />
     <Compile Include="TTreeNode.cs" />
-    <Compile Include="TTreeRoot.cs" />
+    <Compile Include="TTree.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

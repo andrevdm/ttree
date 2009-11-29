@@ -48,7 +48,7 @@ namespace TTreeProfiler
 			Console.WriteLine( "Tree min order (max = min + 3)?" );
 			int orderMin = int.Parse( Console.ReadLine() );
 			
-			TTreeRoot<string> root = new TTreeRoot<string>( orderMin, orderMin + 3 );
+			TTree<string> root = new TTree<string>( orderMin, orderMin + 3 );
 			SortedList<string, string> sortedList = new SortedList<string, string>();
 
 			for( int i = 0; i < max; ++i )
@@ -77,7 +77,7 @@ namespace TTreeProfiler
 			Console.WriteLine( "Tree min order (max = min + 3)?" );
 			int orderMin = int.Parse( Console.ReadLine() );
 
-			TTreeRoot<string> root = new TTreeRoot<string>( orderMin, orderMin + 3 );
+			TTree<string> root = new TTree<string>( orderMin, orderMin + 3 );
 
 			for( int i = 0; i < max; ++i )
 			{
@@ -106,7 +106,7 @@ namespace TTreeProfiler
 			profiler.AddCombine( "search", 75 );
 
 			int[][] ttreeOrders = new int[][] { new[] { 40, 43 }, new[] { 97, 100 }, new[] { 17, 20 }, new[] { 7, 10 }, new[] { 497, 500 }, new[] { 2000, 2003 }, };
-			List<TTreeRoot<string>> trees = new List<TTreeRoot<string>>();
+			List<TTree<string>> trees = new List<TTree<string>>();
 
 			for( int tpos = 0; tpos < ttreeOrders.Length; ++tpos )
 			{
@@ -114,9 +114,9 @@ namespace TTreeProfiler
 				var order = ttreeOrders[ pos ];
 				string name = string.Format( "{0}-{1}", order[ 0 ], order[ 1 ] );
 
-				trees.Add( new TTreeRoot<string>( order[ 0 ], order[ 1 ] ) );
+				trees.Add( new TTree<string>( order[ 0 ], order[ 1 ] ) );
 				profiler.Add( "add", "T-Tree(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Add( s ), values.Count, i ) );
-				profiler.Add( "search", "T-Tree(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Search( s ), trees[ pos ].ItemCount - 1, i ) );
+				profiler.Add( "search", "T-Tree(" + name + ")", i => Time( values, seconds, i.Desc + " - " + i.Group, s => trees[ pos ].Search( s ), trees[ pos ].Count - 1, i ) );
 			}
 
 

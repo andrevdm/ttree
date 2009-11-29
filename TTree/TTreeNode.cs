@@ -6,29 +6,37 @@ using System.Collections;
 
 namespace TTree
 {
-	/// <summary>
-	/// T-Tree implementation.
-	/// 
-	/// “A T-tree is a balanced index tree data structure optimized for cases where both the 
-	/// index and the actual data are fully kept in memory, just as a B-tree is an index structure 
-	/// optimized for storage on block oriented external storage devices like hard disks. T-trees 
-	/// seek to gain the performance benefits of in-memory tree structures such as AVL trees while 
-	/// avoiding the large storage space overhead which is common to them.” 
-	/// (from http://en.wikipedia.org/wiki/T-tree)
-	///
-	/// Google for “A Study of Index Structures for Main Memory Database Management Systems” 
-	/// for a comprehensive discussion of T-Trees
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	public class TTreeNode<T> : ITTreeNode<T>
-		where T : IComparable
+    /// <summary>
+    /// Default TTreeNode used with the default TTree.
+    /// See TTreeNode<TItem, TNode> for more information
+    /// </summary>
+    /// <typeparam name="TItem"></typeparam>
+    public class SimpleTTreeNode<TItem> : TTreeNode<TItem, SimpleTTreeNode<TItem>>
+        where TItem : IComparable
+    {
+        public SimpleTTreeNode( int minimum, int maximum, TTree<TItem,SimpleTTreeNode<TItem>> root )
+            : base( minimum, maximum, root )
+        {
+        }
+    }
+
+    /// <summary>
+    /// Node of a TTree.
+    /// When working with a TTree you should always use the TTree class and not the
+    /// nodes directly
+    /// </summary>
+    /// <typeparam name="TItem"></typeparam>
+    /// <typeparam name="TNode"></typeparam>
+    public abstract class TTreeNode<TItem, TNode> : IEnumerable<TItem>
+		where TItem : IComparable
+        where TNode : TTreeNode<TItem, TNode>
 	{
-		private readonly T[] m_data;
+		private readonly TItem[] m_data;
 		private readonly int m_minimum;
 		private int m_height = 0;
-		private readonly TTreeRoot<T> m_root;
+		private readonly TTree<TItem,TNode> m_tree;
 
-		public TTreeNode( int minimum, int maximum, TTreeRoot<T> root )
+		protected TTreeNode( int minimum, int maximum, TTree<TItem,TNode> tree )
 		{
 			#region param checks
 			if( minimum < 1 )
@@ -37,14 +45,14 @@ namespace TTree
 			if( maximum < minimum )
 				throw new ArgumentOutOfRangeException( "maximum", "Maximum value must be greater than the minimum. " );
 
-			if( root == null )
+			if( tree == null )
 				throw new ArgumentNullException( "root" );
 			#endregion
 
 			ItemCount = 0;
-			m_data = new T[ maximum ];
+			m_data = new TItem[ maximum ];
 			m_minimum = minimum;
-			m_root = root;
+			m_tree = tree;
 		}
 
 		/// <summary>
@@ -52,7 +60,7 @@ namespace TTree
 		/// </summary>
 		/// <param name="item">The item.</param>
 		/// <returns>True if the item was added or false if it already existed and was not </returns>
-		public bool AddItem( T item )
+		public bool AddItem( TItem item )
 		{
 			bool isBoundingNode;
 			int comparedToFirst = 0;
@@ -80,7 +88,7 @@ namespace TTree
 				else
 				{
 					//Copy the old minimum. This current item will be inserted into this node
-					T oldMinimum = m_data[ 0 ];
+					TItem oldMinimum = m_data[ 0 ];
 
                     if ( !InsertInCurrentNode( item, ShiftType.FullShiftToLeft ) )
 						return false;
@@ -140,16 +148,16 @@ namespace TTree
 				}
 				else
 				{
-					TTreeNode<T> newChild = CreateChild( item );
+					TTreeNode<TItem,TNode> newChild = CreateChild( item );
 
 					//Add it as the the left or the right child
 					if( comparedToFirst < 0 )
 					{
-						Left = newChild;
+                        Left = (TNode)newChild;
 					}
 					else
 					{
-						Right = newChild;
+                        Right = (TNode)newChild;
 					}
 
 					UpdateHeight( HeightUpdateType.UpdateAllUpwards );
@@ -162,18 +170,6 @@ namespace TTree
 		}
 
 		/// <summary>
-		/// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
-		/// </summary>
-		/// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
-		/// <exception cref="T:System.NotSupportedException">
-		/// The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
-		/// </exception>
-		public void Add( T item )
-		{
-			AddItem( item );
-		}
-
-		/// <summary>
 		/// Inserts an item into the current node. This method can be called in two instances
 		/// 1 - When this node is not full
 		/// 2 - When this node is full and the first item has been copied so that it can be
@@ -182,7 +178,7 @@ namespace TTree
 		/// <param name="item">The item.</param>
 		/// <param name="shiftType">if set to <c>true</c> [full shift to left].</param>
 		/// <returns></returns>
-        private bool InsertInCurrentNode( T item, ShiftType shiftType )
+        private bool InsertInCurrentNode( TItem item, ShiftType shiftType )
 		{
             bool fullShiftToLeft = (shiftType == ShiftType.FullShiftToLeft);
             Debug.Assert( fullShiftToLeft ? (ItemCount == m_data.Length) : (ItemCount < m_data.Length), "If doing a shift left, the node should have been full, otherwise it should not be called if the node is full" );
@@ -190,7 +186,7 @@ namespace TTree
 			//TODO profile and see if there is any advantage to checking the min and max values here and setting closest=0 or closest=Count. Remember to check that the item was not already added
 
 			//Find the position with the closest value to the item being added.
-			int closest = Array.BinarySearch<T>( m_data, 0, ItemCount, item );
+			int closest = Array.BinarySearch<TItem>( m_data, 0, ItemCount, item );
 
 			//If closest is positive then the item already exists at this level, so
 			// no need to add it again
@@ -322,30 +318,30 @@ namespace TTree
 
 		private void RotateRR()
 		{
-			TTreeNode<T> nodeRight = Right;
-			TTreeNode<T> nodeRightsLeft = nodeRight.Left;
+			TTreeNode<TItem, TNode> nodeRight = Right;
+			TTreeNode<TItem, TNode> nodeRightsLeft = nodeRight.Left;
 
 			if( Parent != null )
 			{
 				if( Parent.Left == this )
-					Parent.Left = nodeRight;
+                    Parent.Left = (TNode)nodeRight;
 				else
-					Parent.Right = nodeRight;
+                    Parent.Right = (TNode)nodeRight;
 			}
 
 			nodeRight.Parent = Parent;
-			nodeRight.Left = this;
-			Parent = nodeRight;
-			Right = nodeRightsLeft;
+            nodeRight.Left = (TNode)this;
+            Parent = (TNode)nodeRight;
+            Right = (TNode)nodeRightsLeft;
 
 			if( nodeRightsLeft != null )
 			{
-				nodeRightsLeft.Parent = this;
+                nodeRightsLeft.Parent = (TNode)this;
 			}
 
 			if( nodeRight.Parent == null )
 			{
-				Root.RootNode = nodeRight;
+				Tree.RootNode = (TNode)nodeRight;
 			}
 
             UpdateHeight(HeightUpdateType.UpdateAllUpwards);
@@ -353,45 +349,45 @@ namespace TTree
 
 		private void RotateLL()
 		{
-			TTreeNode<T> left = Left;
-			TTreeNode<T> leftsRight = left.Right;
+			TTreeNode<TItem, TNode> left = Left;
+            TTreeNode<TItem, TNode> leftsRight = left.Right;
 
 			if( Parent != null )
 			{
 				if( Parent.Left == this )
-					Parent.Left = left;
+                    Parent.Left = (TNode)left;
 				else
-					Parent.Right = left;
+                    Parent.Right = (TNode)left;
 			}
 
 			left.Parent = Parent;
-			left.Right = this;
-			Parent = left;
-			Left = leftsRight;
+            left.Right = (TNode)this;
+            Parent = (TNode)left;
+            Left = (TNode)leftsRight;
 
 			if( leftsRight != null )
 			{
-				leftsRight.Parent = this;
+                leftsRight.Parent = (TNode)this;
 			}
 
 			if( left.Parent == null )
 			{
-				Root.RootNode = left;
+				Tree.RootNode = (TNode)left;
 			}
 
             UpdateHeight(HeightUpdateType.UpdateAllUpwards);
 		}
 
-		public bool Remove( T item )
+		public bool Remove( TItem item )
 		{
-			SearchResult<T> searchResult = SearchFor( item );
+			SearchResult<TItem,TNode> searchResult = SearchFor( item );
 
 			if( searchResult == null )
 			{
 				return false;
 			}
 
-			TTreeNode<T> rebalanceFrom = searchResult.Node;
+			TTreeNode<TItem,TNode> rebalanceFrom = searchResult.Node;
 
 			//If the remove will not cause an underflow then, delete the value and stop
 			if( searchResult.Node.ItemCount > searchResult.Node.m_minimum )
@@ -468,7 +464,7 @@ namespace TTree
 			return true;
 		}
 
-		private T CutGreatestLowerBound()
+		private TItem CutGreatestLowerBound()
 		{
 			if( Right == null )
 			{
@@ -496,11 +492,18 @@ namespace TTree
 			}
 		}
 
-		private void DeleteFoundValue( SearchResult<T> searchResult )
+		private void DeleteFoundValue( SearchResult<TItem, TNode> searchResult )
 		{
 			Array.Copy( searchResult.Node.m_data, searchResult.Index + 1, searchResult.Node.m_data, searchResult.Index, searchResult.Node.m_data.Length - 1 - searchResult.Index );
 			searchResult.Node.ItemCount--;
 		}
+
+        public void Clear()
+        {
+            ItemCount = 0;
+            Left = Right = null;
+            m_height = 0;
+        }
 
 		/// <summary>
 		/// Search for an item using a custom comparison function
@@ -509,13 +512,13 @@ namespace TTree
 		/// <param name="item">The item.</param>
 		/// <param name="comparer">The comparer.</param>
 		/// <returns></returns>
-		public T Search<TSearch>( TSearch item, Func<TSearch, T, int> comparer )
+		public TItem Search<TSearch>( TSearch item, Func<TSearch, TItem, int> comparer )
 		{
 			var result = SearchFor( item, comparer );
-			return (result == null) ? default( T ) : result.Value;
+			return (result == null) ? default( TItem ) : result.Value;
 		}
 
-		public SearchResult<T> SearchFor<TSearch>( TSearch item, Func<TSearch, T, int> comparer )
+		public SearchResult<TItem, TNode> SearchFor<TSearch>( TSearch item, Func<TSearch, TItem, int> comparer )
 		{
 			if( ItemCount == 0 )
 				return null;
@@ -523,7 +526,7 @@ namespace TTree
 			int compare = comparer( item, m_data[ 0 ] );
 
 			if( compare == 0 )
-				return new SearchResult<T>( m_data[ 0 ], this, 0 );
+				return new SearchResult<TItem, TNode>( m_data[ 0 ], this, 0 );
 
 			if( compare < 0 )
 			{
@@ -536,7 +539,7 @@ namespace TTree
 			compare = comparer( item, m_data[ ItemCount - 1 ] );
 
 			if( compare == 0 )
-				return new SearchResult<T>( m_data[ ItemCount - 1 ], this, ItemCount - 1 );
+				return new SearchResult<TItem, TNode>( m_data[ ItemCount - 1 ], this, ItemCount - 1 );
 
 			if( compare > 0 )
 			{
@@ -549,7 +552,7 @@ namespace TTree
 			int closest = BinarySearch<TSearch>( m_data, 0, ItemCount, item, comparer );
 
 			if( closest >= 0 )
-				return new SearchResult<T>( m_data[ closest ], this, closest );
+				return new SearchResult<TItem, TNode>( m_data[ closest ], this, closest );
 
 			return null;
 		}
@@ -559,13 +562,13 @@ namespace TTree
 		/// </summary>
 		/// <param name="item">The item.</param>
 		/// <returns></returns>
-		public T Search( T item )
+		public TItem Search( TItem item )
 		{
 			var result = SearchFor( item );
-			return (result == null) ? default( T ) : result.Value;
+			return (result == null) ? default( TItem ) : result.Value;
 		}
 
-		public SearchResult<T> SearchFor( T item )
+		public SearchResult<TItem, TNode> SearchFor( TItem item )
 		{
 			//This code is not shared with the other Search() method to keep things as fast as possible
 
@@ -575,7 +578,7 @@ namespace TTree
 			int compare = item.CompareTo( m_data[ 0 ] );
 
 			if( compare == 0 )
-				return new SearchResult<T>( m_data[ 0 ], this, 0 );
+				return new SearchResult<TItem, TNode>( m_data[ 0 ], this, 0 );
 
 			if( compare < 0 )
 			{
@@ -588,7 +591,7 @@ namespace TTree
 			compare = item.CompareTo( m_data[ ItemCount - 1 ] );
 
 			if( compare == 0 )
-				return new SearchResult<T>( m_data[ ItemCount - 1 ], this, ItemCount - 1 );
+				return new SearchResult<TItem, TNode>( m_data[ ItemCount - 1 ], this, ItemCount - 1 );
 
 			if( compare > 0 )
 			{
@@ -598,10 +601,10 @@ namespace TTree
 					return null;
 			}
 
-			int closest = Array.BinarySearch<T>( m_data, 0, ItemCount, item );
+			int closest = Array.BinarySearch<TItem>( m_data, 0, ItemCount, item );
 
 			if( closest >= 0 )
-				return new SearchResult<T>( m_data[ closest ], this, closest );
+				return new SearchResult<TItem, TNode>( m_data[ closest ], this, closest );
 
 			return null;
 		}
@@ -611,36 +614,9 @@ namespace TTree
 		/// </summary>
 		/// <param name="destinationArray">The destination array.</param>
 		/// <param name="index">The index.</param>
-		public void CopyItems( T[] destinationArray, int index )
+		public void CopyItems( TItem[] destinationArray, int index )
 		{
 			m_data.CopyTo( destinationArray, index );
-		}
-
-		/// <summary>
-		/// Removes all items from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
-		/// </summary>
-		/// <exception cref="T:System.NotSupportedException">
-		/// The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
-		/// </exception>
-		public void Clear()
-		{
-			ItemCount = 0;
-			Left = Right = null;
-			m_height = 0;
-
-            UpdateHeight( HeightUpdateType.UpdateAllUpwards );
-		}
-
-		/// <summary>
-		/// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
-		/// </summary>
-		/// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
-		/// <returns>
-		/// true if <paramref name="item"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false.
-		/// </returns>
-		public bool Contains( T item )
-		{
-			return (SearchFor( item ) != null);
 		}
 
 		/// <summary>
@@ -663,9 +639,9 @@ namespace TTree
 		/// -or-
 		/// Type <paramref name="T"/> cannot be cast automatically to the type of the destination <paramref name="array"/>.
 		/// </exception>
-		public void CopyTo( T[] array, int arrayIndex )
+		public void CopyTo( TItem[] array, int arrayIndex )
 		{
-			foreach( T item in this )
+			foreach( TItem item in this )
 			{
 				array[ arrayIndex++ ] = item;
 			}
@@ -676,7 +652,7 @@ namespace TTree
 			return ToDot( i => i.ToString() );
 		}
 
-		public string ToDot( Func<T, string> toString )
+		public string ToDot( Func<TItem, string> toString )
 		{
 			var dot = new StringBuilder();
 
@@ -688,7 +664,7 @@ namespace TTree
 			return dot.ToString();
 		}
 
-		private void ToDot( StringBuilder dot, Func<T, string> toString )
+		private void ToDot( StringBuilder dot, Func<TItem, string> toString )
 		{
 			dot.AppendFormat( "	struct{0} [shape=record, label=\"{{ {{ ", GetHashCode().ToString( "X" ) );
 
@@ -728,13 +704,13 @@ namespace TTree
 		/// </summary>
 		/// <param name="item">The item.</param>
 		/// <returns></returns>
-		private TTreeNode<T> CreateChild( T item )
+		private TNode CreateChild( TItem item )
 		{
 			//Create a new child node
-			TTreeNode<T> newChild = new TTreeNode<T>( m_minimum, m_data.Length, Root );
+			TNode newChild = Tree.CreateNode( m_minimum, m_data.Length );
 			newChild.m_data[ 0 ] = item;
 			newChild.ItemCount = 1;
-			newChild.Parent = this;
+			newChild.Parent = (TNode)this;
 
 			return newChild;
 		}
@@ -769,7 +745,7 @@ namespace TTree
 		/// <param name="value">The value.</param>
 		/// <param name="comparer">The comparer.</param>
 		/// <returns></returns>
-		private int BinarySearch<TSearch>( T[] array, int index, int length, TSearch value, Func<TSearch, T, int> comparer )
+		private int BinarySearch<TSearch>( TItem[] array, int index, int length, TSearch value, Func<TSearch, TItem, int> comparer )
 		{
 			int num1 = index;
 			int num2 = (index + length) - 1;
@@ -810,7 +786,7 @@ namespace TTree
 		}
 
 		#region IEnumerable<T>
-		public IEnumerator<T> GetEnumerator()
+		public IEnumerator<TItem> GetEnumerator()
 		{
 			if( Left != null )
 			{
@@ -857,21 +833,13 @@ namespace TTree
 			}
 		}
 
-		/// <summary>
-		/// Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
-		/// </summary>
-		/// <value></value>
-		/// <returns>true if the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only; otherwise, false.
-		/// </returns>
-		public bool IsReadOnly { get { return false; } }
-
 		public int Height { get { return m_height; } }
 		public int ItemCount { get; protected set; }
 		public int MaxItems { get { return m_data.Length; } }
-		public TTreeNode<T> Left { get; internal set; }
-		public TTreeNode<T> Right { get; internal set; }
-		public TTreeNode<T> Parent { get; internal set; }
-		public TTreeRoot<T> Root { get { return m_root; } }
+		public TNode Left { get; internal set; }
+        public TNode Right { get; internal set; }
+        public TNode Parent { get; internal set; }
+		public TTree<TItem,TNode> Tree { get { return m_tree; } }
 		public bool IsLeaf { get { return (Left == null) && (Right == null); } }
 		public bool IsHalfLeaf { get { return !IsLeaf && ((Left == null) || (Right == null)); } }
 		public bool IsInternal { get { return (Left != null) && (Right != null); } }
